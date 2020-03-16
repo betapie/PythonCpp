@@ -20,6 +20,51 @@ namespace pycpp
     class PythonList : public PythonObject
     {
         static_assert(isPythonBaseType_v<T>, "PythonList<T>: T is not a valid PythonBaseType");
+    private:
+        // Helper proxy to return some kind of reference type from subscription operator
+        class Reference
+        {
+        public:
+            explicit Reference(PythonList& pyList, size_t idx) noexcept
+                : m_list(pyList), m_idx(idx)
+            {}
+
+            Reference(const Reference& other) = delete;
+            Reference& operator=(const Reference& other) = delete;
+
+            Reference(Reference&& other)
+                : m_list(other.m_list), m_idx(other.m_idx)
+            {}
+
+            Reference& operator=(Reference&& other)
+            {
+                m_list = other.m_list;
+                m_idx = other.m_idx;
+                return *this;
+            }
+
+            operator T()
+            {
+                auto pItem = PyList_GetItem(m_list.get(), m_idx);
+                if (!pItem)
+                    throw PythonError();
+                return python_cast<T>(pItem);
+            }
+
+            Reference& operator=(const T& val)
+            {
+                auto pyObj = ToPythonObject(val);
+                Py_INCREF(pyObj.get()); // PyList_SetItem steals a reference
+                if (PyList_SetItem(m_list.get(), m_idx, pyObj.get()) == -1)
+                    throw PythonError();
+                return *this;
+            }
+
+        private:
+            PythonList& m_list;
+            size_t m_idx;
+        };
+
     public:
         // Default constructor will create a new PythonList with size 0
         // analog to myList = [] or myList = List() in Python
@@ -108,9 +153,18 @@ namespace pycpp
             return PyList_Size(m_pObject); // can this fail in any way?
         }
 
-        // How to implement operator[]? What shall it return?
-        // Probably create a proxy PythonRef class that will allow
-        // reading and writing to the value of the object
+        Reference operator[](size_t idx)
+        {
+            return Reference(*this, idx);
+        }
+
+        T operator[](size_t idx) const
+        {
+            auto pItem = PyList_GetItem(m_pObject, idx);
+            if (!pItem)
+                throw PythonError();
+            return python_cast<T>(pItem);
+        }
 
         void append(const T& val)
         {

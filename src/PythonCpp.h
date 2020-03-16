@@ -1,5 +1,10 @@
 #pragma once
 
+/*
+    This is the header that should be included in your project. It makes sure that "Python.h" is included
+    before any stl headers. This is important due to a few typedefs in "Python.h".
+*/
+
 #ifndef PYTHON_CPP_H
 #define PYTHON_CPP_H
 
@@ -10,5 +15,6 @@
 #include "PythonInterpreter.h"
 #include "PythonSys.h"
 #include "PythonList.h"
+#include "PythonUtilities.h"
 
 #endif // PYTHON_CPP_H

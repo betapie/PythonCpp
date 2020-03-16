@@ -4,6 +4,7 @@
 #define PYTHON_TYPE_TRAITS_H
 
 #include <type_traits>
+#include <complex>
 #include "PythonObject.h"
 //#include "PythonList.h"
 
@@ -35,6 +36,12 @@ namespace pycpp
 
     template<>
     struct isPythonBaseType<double> : std::true_type
+    {};
+
+    // C API only allows initialization from and conversion to double
+    // so that is the only type that is supported
+    template<>
+    struct isPythonBaseType<std::complex<double>> : std::true_type
     {};
 
     // using generic PythonObjects should also be allowed but can be dangerous
@@ -116,6 +123,15 @@ namespace pycpp
         return pObject;
     }
 
+    template<>
+    [[nodiscard]] PythonObject ToPythonObject(const std::complex<double>& val)
+    {
+        PythonObject pObject = PyComplex_FromDoubles(val.real(), val.imag());
+        if (!pObject)
+            throw PythonError();
+        return pObject;
+    }
+
     // python_cast converts the contents of a PythonObject to your desired type, if possible.
     // for example a conversion to long will succeed, if the Python object pointed to is of type int or has
     // __int__() implemented (can be converted to int). This cast will also check for possible overflow
@@ -189,7 +205,99 @@ namespace pycpp
         return ret;
     }
 
+    template<>
+    [[nodiscard]] std::complex<double> python_cast<std::complex<double>>(const PythonObject& pyObj)
+    {
+        const auto real = PyComplex_RealAsDouble(pyObj.get());
+        if (!real)
+            throw PythonError();
+        const auto imag = PyComplex_ImagAsDouble(pyObj.get());
+        if (!imag)
+            throw PythonError();
 
+        return { real, imag };
+    }
+
+    template<typename T> // base template, this will not do anything except warning about wrong types
+    [[nodiscard]] T python_cast(PyObject* pPyObj)
+    {
+        static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
+        return T{};
+    }
+
+    template<>
+    [[nodiscard]] bool python_cast<bool>(PyObject* pPyObj)
+    {
+        const auto check = PyObject_IsTrue(pPyObj);
+        if (check == -1)
+            throw PythonError();
+        if (check == 1)
+            return true;
+        return false;
+    }
+
+    template<>
+    [[nodiscard]] long python_cast<long>(PyObject* pPyObj)
+    {
+        const auto ret = PyLong_AsLong(pPyObj);
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+
+    template<>
+    [[nodiscard]] unsigned long python_cast<unsigned long>(PyObject* pPyObj)
+    {
+        const auto ret = PyLong_AsUnsignedLong(pPyObj);
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+
+    template<>
+    [[nodiscard]] long long python_cast<long long>(PyObject* pPyObj)
+    {
+        const auto ret = PyLong_AsLongLong(pPyObj);
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+
+    template<>
+    [[nodiscard]] unsigned long long python_cast<unsigned long long>(PyObject* pPyObj)
+    {
+        const auto ret = PyLong_AsUnsignedLongLong(pPyObj);
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+
+    template<>
+    [[nodiscard]] double python_cast<double>(PyObject* pPyObj)
+    {
+        const auto ret = PyFloat_AsDouble(pPyObj);
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+
+    template<>
+    [[nodiscard]] std::complex<double> python_cast<std::complex<double>>(PyObject* pPyObj)
+    {
+        const auto real = PyComplex_RealAsDouble(pPyObj);
+        if (!real)
+            throw PythonError();
+        const auto imag = PyComplex_ImagAsDouble(pPyObj);
+        if (!imag)
+            throw PythonError();
+
+        return { real, imag };
+    }
     // TODO: implement unchecked_python_cast and forced_python_cast
 }
 
