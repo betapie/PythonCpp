@@ -44,6 +44,10 @@ namespace pycpp
     struct isPythonBaseType<std::complex<double>> : std::true_type
     {};
 
+    template<>
+    struct isPythonBaseType<std::string> : std::true_type
+    {};
+
     // using generic PythonObjects should also be allowed but can be dangerous
     template<>
     struct isPythonBaseType<PythonObject> : std::true_type
@@ -218,6 +222,15 @@ namespace pycpp
         return { real, imag };
     }
 
+    template<>
+    [[nodiscard]] std::string python_cast<std::string>(const PythonObject& pyObj)
+    {
+        auto pData = PyUnicode_AsUTF8(pyObj.get());
+        if (!pData)
+            throw PythonError();
+        return std::string(pData);
+    }
+
     template<typename T> // base template, this will not do anything except warning about wrong types
     [[nodiscard]] T python_cast(PyObject* pPyObj)
     {
@@ -298,6 +311,16 @@ namespace pycpp
 
         return { real, imag };
     }
+
+    template<>
+    [[nodiscard]] std::string python_cast<std::string>(PyObject* pPyObj)
+    {
+        auto pData = PyUnicode_AsUTF8(pPyObj);
+        if (!pData)
+            throw PythonError();
+        return std::string(pData);
+    }
+
     // TODO: implement unchecked_python_cast and forced_python_cast
 }
 

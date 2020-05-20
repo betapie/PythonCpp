@@ -6,6 +6,8 @@
 #include "PythonObject.h"
 #include "PythonError.h"
 #include <initializer_list>
+#include <vector>
+#include <algorithm>
 
 // WARNING: THIS IS NOWHERE NEAR FEATURE COMPLETE!
 
@@ -99,6 +101,23 @@ namespace pycpp
                     throw PythonError();
                 ++idx;
             }
+        }
+
+        template<typename Container, typename val_t = typename Container::value_type, std::enable_if_t<isPythonBaseType_v<val_t>, int> = 0>
+        PythonList(const Container& container)
+        {
+            m_pObject = PyList_New(container.size());
+            if (!m_pObject)
+                throw PythonError();
+            auto idx = 0;
+            std::for_each(container.begin(), container.end(), [&](const auto& elem)
+                {
+                    auto newElem = ToPythonObject(elem);
+                    Py_INCREF(newElem.get()); // PyList_SetItem steals a ref..
+                    if (PyList_SetItem(m_pObject, idx, newElem.get()) == -1)
+                        throw PythonError();
+                    ++idx;
+                });
         }
 
         // Take ownership of an existing PyObject which points to a Python List or subtype of List
@@ -216,6 +235,21 @@ namespace pycpp
         {
             if (PyList_Reverse(m_pObject) == -1)
                 throw PythonError();
+        }
+
+        // I did not seem to find any way to access the raw data of the PyList object
+        std::vector<T> ToVector()
+        {
+            std::vector<T> ret;
+            ret.reserve((size()));
+            for (size_t idx = 0; idx < size(); ++idx)
+            {
+                auto pItem = PyList_GetItem(m_pObject, idx);
+                if (!pItem)
+                    throw PythonError();
+                ret.push_back(python_cast<T>(pItem));
+            }
+            return ret;
         }
 
     private:

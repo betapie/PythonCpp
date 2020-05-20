@@ -116,6 +116,13 @@ namespace pycpp
             return std::string(PyBytes_AsString(pyStr.get()));
         }
 
+        [[nodiscard]] static PythonObject BorrowedRef(PyObject* pPyObj)
+        {
+            if (pPyObj)
+                Py_INCREF(pPyObj);
+            return PythonObject(pPyObj);
+        }
+
     protected:
         PyObject* m_pObject = nullptr;
     };

@@ -8,10 +8,40 @@
 #define PYTHON_UTILITIES_H
 
 #include "PythonObject.h"
+#include "PythonError.h"
+#include <string>
 
 namespace pycpp
 {
     PythonObject ImportModule(const char* module_name);
+    PythonObject ImportModule(std::string module_name);
+
+    template<typename... Args>
+    PythonObject BuildValue(const char* format, Args... args)
+    {
+        PythonObject ret = Py_BuildValue(format, args...);
+        if (!ret)
+            throw PythonError();
+        return ret;
+    }
+
+    PythonObject GetAttributeString(PyObject* pObject, const char* attr_name);
+    PythonObject GetAttributeString(const PythonObject& pObject, const char* attr_name);
+    PythonObject GetAttributeString(PyObject* pObject, const std::string& attr_name);
+    PythonObject GetAttributeString(const PythonObject& pObject, const std::string& attr_name);
+
+    PythonObject CallObject(PyObject* pCallableObject, PyObject* pArglist);
+    PythonObject CallObject(const PythonObject& pCallableObject, PyObject* pArglist);
+    PythonObject CallObject(PyObject* pCallableObject, const PythonObject& pArglist);
+    PythonObject CallObject(const PythonObject& pCallableObject, const PythonObject& pArglist);
+
+    //template<typename... Args, std::enable_if_t<isPythonBaseType_v<Args...>, int> = 0> // TODO Fix this
+   /* std::string BuildArgFormat()
+    {
+        std::string retVal;
+
+        return {};
+    }*/
 }
 
 #endif // PYTHON_UTILITIES_H
