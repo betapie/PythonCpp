@@ -14,6 +14,12 @@ namespace pycpp
     struct isPythonBaseType : std::false_type
     {};
 
+#ifndef Py_LIMITED_API
+    template<>
+    struct isPythonBaseType<int> : std::true_type
+    {};
+#endif //Py_LIMITED_API
+
     template<>
     struct isPythonBaseType<bool> : std::true_type
     {};
@@ -45,6 +51,10 @@ namespace pycpp
     {};
 
     template<>
+    struct isPythonBaseType<const char*> : std::true_type
+    {};
+
+    template<>
     struct isPythonBaseType<std::string> : std::true_type
     {};
 
@@ -73,7 +83,18 @@ namespace pycpp
     // note: no implementations for PyLong_FromDouble... and other implicit conversions. If you want your PythonObject
     // to be of a certain type, be explicit about the type you pass in
 
-    template<> // refactor when wrappers around PyLong_From<type> have been implemented
+#ifndef Py_LIMITED_API
+    template<>
+    [[nodiscard]] PythonObject ToPythonObject(const int& val)
+    {
+        PythonObject pObject = PyLong_FromLong(val);
+        if (!pObject)
+            throw PythonError();
+        return pObject;
+    }
+#endif //Py_LIMITED_API
+
+    template<>
     [[nodiscard]] PythonObject ToPythonObject(const long& val)
     {
         PythonObject pObject = PyLong_FromLong(val);
@@ -136,11 +157,14 @@ namespace pycpp
         return pObject;
     }
 
+    // TODO ToPythonObject for const char* and std::string
+
     // python_cast converts the contents of a PythonObject to your desired type, if possible.
     // for example a conversion to long will succeed, if the Python object pointed to is of type int or has
     // __int__() implemented (can be converted to int). This cast will also check for possible overflow
     // note: Python C API allows for conversion from int to double etc. These will not be supported.
     // Please cast them accordingly and if you need conversions cast them manually
+
     template<typename T> // base template, this will not do anything except warning about wrong types
     [[nodiscard]] T python_cast(const PythonObject& pyObj)
     {
@@ -158,6 +182,18 @@ namespace pycpp
             return true;
         return false;
     }
+
+#ifndef Py_LIMITED_API
+    template<>
+    [[nodiscard]] int python_cast<int>(const PythonObject& pyObj)
+    {
+        const auto ret = _PyLong_AsInt(pyObj.get());
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+#endif //Py_LIMITED_API
 
     template<>
     [[nodiscard]] long python_cast<long>(const PythonObject& pyObj)
@@ -220,6 +256,15 @@ namespace pycpp
             throw PythonError();
 
         return { real, imag };
+    }
+
+    template<>
+    [[nodiscard]] const char* python_cast<const char*>(const PythonObject& pyObj)
+    {
+        auto pData = PyUnicode_AsUTF8(pyObj.get());
+        if (!pData)
+            throw PythonError();
+        return pData;
     }
 
     template<>

@@ -9,7 +9,7 @@ pycpp::PythonObject pycpp::ImportModule(const char* module_name)
     return retVal;
 }
 
-pycpp::PythonObject pycpp::ImportModule(std::string module_name)
+pycpp::PythonObject pycpp::ImportModule(const std::string& module_name)
 {
     return ImportModule(module_name.c_str());
 }

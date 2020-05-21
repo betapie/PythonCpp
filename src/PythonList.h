@@ -9,8 +9,6 @@
 #include <vector>
 #include <algorithm>
 
-// WARNING: THIS IS NOWHERE NEAR FEATURE COMPLETE!
-
 namespace pycpp
 {
     /*
@@ -34,11 +32,11 @@ namespace pycpp
             Reference(const Reference& other) = delete;
             Reference& operator=(const Reference& other) = delete;
 
-            Reference(Reference&& other)
+            Reference(Reference&& other) noexcept
                 : m_list(other.m_list), m_idx(other.m_idx)
             {}
 
-            Reference& operator=(Reference&& other)
+            Reference& operator=(Reference&& other) noexcept
             {
                 m_list = other.m_list;
                 m_idx = other.m_idx;
@@ -78,14 +76,6 @@ namespace pycpp
         }
 
         // Variadic Constructor disabled atm. Use the initializer_list overload
-
-        //// Create a Python List of size sizeof(Args...) with the contents of args...
-        //template<typename... Args> // TODO enable_if Args... are convertible to T
-        //PythonList(Args... args)
-        //{
-        //    m_pObject = PyList_New(sizeof(Args...));
-        //    // Initialize the values
-        //}
 
         PythonList(const std::initializer_list<T>& iList)
         {

@@ -23,69 +23,13 @@ namespace pycpp
             friend class PythonInterpreter;
             friend std::unique_ptr<PyInstance> std::make_unique<PyInstance>();
         private:
-            PyInstance()
-            {
-                Py_Initialize();
-                // TODO handle failure of initialization
-            }
+            PyInstance();
         public:
-            ~PyInstance()
-            {
-                Py_Finalize();
-            }
+            ~PyInstance();
             PyInstance(const PyInstance& other) = delete;
             PyInstance& operator=(const PyInstance& other) = delete;
         };
     }
-
-    //// Helper class to make a lock handle returnable. If the compiler chooses not to use RVO
-    //// PtrLockGuard can be moved.
-    //class PtrLockGuard
-    //{
-    //public:
-    //    explicit PtrLockGuard(std::mutex& mutex)
-    //        :m_pMutex(&mutex)
-    //    {
-    //        m_pMutex->lock();
-    //    }
-
-    //    ~PtrLockGuard() noexcept
-    //    {
-    //        if (m_pMutex)
-    //            m_pMutex->unlock();
-    //    }
-
-    //    PtrLockGuard(const PtrLockGuard& other) = delete;
-    //    PtrLockGuard& operator=(const PtrLockGuard& other) = delete;
-
-    //    PtrLockGuard(PtrLockGuard&& other) noexcept
-    //        :m_pMutex(other.m_pMutex)
-    //    {
-    //        other.m_pMutex = nullptr;
-    //    }
-
-    //    PtrLockGuard& operator=(PtrLockGuard&& other) noexcept
-    //    {
-    //        if (this == &other)
-    //            return *this;
-
-    //        m_pMutex = other.m_pMutex;
-    //        other.m_pMutex = nullptr;
-    //        return *this;
-    //    }
-
-    //    void Unlock()
-    //    {
-    //        if (m_pMutex)
-    //        {
-    //            m_pMutex->unlock();
-    //            m_pMutex = nullptr;
-    //        }
-    //    }
-
-    //private:
-    //    std::mutex* m_pMutex;
-    //};
 
     class PythonInterpreter
     {

@@ -4,6 +4,17 @@ size_t pycpp::PythonInterpreter::s_refCnt = 0;
 std::mutex pycpp::PythonInterpreter::s_mutex{};
 std::unique_ptr<pycpp::detail::PyInstance> pycpp::PythonInterpreter::s_pInterpreter{};
 
+pycpp::detail::PyInstance::PyInstance()
+{
+    Py_Initialize();
+    // TODO handle failure of initialization
+}
+
+pycpp::detail::PyInstance::~PyInstance()
+{
+    Py_Finalize();
+}
+
 void pycpp::PythonInterpreter::Open()
 {
     if (s_refCnt == 0)

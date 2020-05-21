@@ -14,7 +14,7 @@
 namespace pycpp
 {
     PythonObject ImportModule(const char* module_name);
-    PythonObject ImportModule(std::string module_name);
+    PythonObject ImportModule(const std::string& module_name);
 
     template<typename... Args>
     PythonObject BuildValue(const char* format, Args... args)
@@ -34,14 +34,6 @@ namespace pycpp
     PythonObject CallObject(const PythonObject& pCallableObject, PyObject* pArglist);
     PythonObject CallObject(PyObject* pCallableObject, const PythonObject& pArglist);
     PythonObject CallObject(const PythonObject& pCallableObject, const PythonObject& pArglist);
-
-    //template<typename... Args, std::enable_if_t<isPythonBaseType_v<Args...>, int> = 0> // TODO Fix this
-   /* std::string BuildArgFormat()
-    {
-        std::string retVal;
-
-        return {};
-    }*/
 }
 
 #endif // PYTHON_UTILITIES_H
