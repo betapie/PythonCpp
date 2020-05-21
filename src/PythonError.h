@@ -18,38 +18,14 @@ namespace pycpp
     class PythonError : public std::runtime_error
     {
     public:
-        PythonError()
-            : std::runtime_error(RetrievePyErrorString())
-        {}
+        PythonError();
 
-        explicit PythonError(const std::string& errMsg)
-            : std::runtime_error(errMsg)
-        {}
+        explicit PythonError(const std::string& errMsg);
 
-        explicit PythonError(const char* errMsg)
-            : std::runtime_error(errMsg)
-        {}
+        explicit PythonError(const char* errMsg);
 
     public:
-        static std::string RetrievePyErrorString()
-        {
-            PyObject* pyExcType;
-            PyObject* pyExcValue;
-            PyObject* pyExcTraceback;
-
-            PyErr_Fetch(&pyExcType, &pyExcValue, &pyExcTraceback);
-            PyErr_NormalizeException(&pyExcType, &pyExcValue, &pyExcTraceback);
-
-            PythonObject pyExcTypeObj(pyExcType);
-            PythonObject pyExcValueObj(pyExcValue);
-            PythonObject pyExcTracebackObj(pyExcTraceback);
-
-            const auto typeString = pyExcTypeObj.StringRepr();
-            const auto valueString = pyExcValueObj.StringRepr();
-            const auto traceString = pyExcTracebackObj.StringRepr();
-
-            return valueString + traceString;
-        }
+        static std::string RetrievePyErrorString();
     };
 }
 

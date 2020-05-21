@@ -19,126 +19,42 @@ namespace pycpp
     public:
         PythonObject() noexcept = default;
 
-        PythonObject(nullptr_t) noexcept
-        {}
+        PythonObject(nullptr_t) noexcept;
 
-        PythonObject(PyObject* pObject) noexcept
-            : m_pObject(pObject)
-        {}
+        PythonObject(PyObject* pObject) noexcept;
 
-        PythonObject(const PythonObject& other)
-        {
-            m_pObject = other.m_pObject;
-            Py_INCREF(m_pObject);
-        }
+        PythonObject(const PythonObject& other);
 
-        PythonObject& operator=(const PythonObject& other)
-        {
-            if (this == &other)
-                return *this;
+        PythonObject& operator=(const PythonObject& other);
 
-            Release();
-            m_pObject = other.m_pObject;
-            Py_INCREF(m_pObject);
+        PythonObject(PythonObject&& other) noexcept;
 
-            return *this;
-        }
+        PythonObject& operator=(PythonObject&& other) noexcept;
 
-        PythonObject(PythonObject&& other) noexcept
-        {
-            m_pObject = other.m_pObject;
-            other.m_pObject = nullptr;
-        }
+        PythonObject operator=(PyObject* pObject) noexcept;
 
-        PythonObject& operator=(PythonObject&& other) noexcept
-        {
-            if (this == &other)
-                return *this;
-            
-            Release();
-            m_pObject = other.m_pObject;
-            other.m_pObject = nullptr;
-            return *this;
-        }
+        PythonObject& operator=(nullptr_t);
 
-        PythonObject operator=(PyObject* pObject) noexcept
-        {
-            m_pObject = pObject;
-        }
+        virtual ~PythonObject();
 
-        PythonObject& operator=(nullptr_t)
-        {
-            Release();
-        }
+        [[nodiscard]] PyObject* get() const noexcept;
 
-        virtual ~PythonObject()
-        {
-            Release();
-        }
+        [[nodiscard]] PyObject* operator->() const noexcept;
 
-        [[nodiscard]] PyObject* get() const noexcept
-        {
-            return m_pObject;
-        }
+        [[nodiscard]] operator bool() const noexcept;
 
-        [[nodiscard]] PyObject* operator->() const
-        {
-            return m_pObject;
-        }
-
-        [[nodiscard]] operator bool() const noexcept
-        {
-            return m_pObject != nullptr;
-        }
-
-        inline void Release()
-        {
-            if (m_pObject)
-            {
-                Py_DECREF(m_pObject);
-                m_pObject = nullptr;
-            }
-        }
+        inline void Release();
 
         // This method will on success yield the same result als the buildin repr() function in Python would.
         // This can also fail. However, since this is needed to deduct PythonError::what() we will not throw here
         // In the worst case, the returned string is null
-        [[nodiscard]] std::string StringRepr() noexcept
-        {
-            if (!m_pObject)
-                return std::string();
-            PythonObject pyStringRepr = PyObject_Repr(m_pObject);
-            if (!pyStringRepr)
-                return std::string();
-            PythonObject pyStr = PyUnicode_AsEncodedString(pyStringRepr.get(), "utf-8", "~E~");
-            if (!pyStr)
-                return std::string();
-            return std::string(PyBytes_AsString(pyStr.get()));
-        }
+        [[nodiscard]] std::string StringRepr() noexcept;
 
-        [[nodiscard]] static PythonObject BorrowedRef(PyObject* pPyObj)
-        {
-            if (pPyObj)
-                Py_INCREF(pPyObj);
-            return PythonObject(pPyObj);
-        }
+        [[nodiscard]] static PythonObject BorrowedRef(PyObject* pPyObj);
 
     protected:
         PyObject* m_pObject = nullptr;
     };
-
-    /*template<typename return_type, typename... Args>
-    class PythonFunction
-    {
-    public:
-        return_type operator()(Args&&...)
-        {
-            
-            return return_type();
-        }
-    private:
-
-    };*/
 }
 
 #endif // PYTHON_OBJECT_H
