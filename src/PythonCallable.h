@@ -90,6 +90,12 @@ namespace pycpp
         }
     }
 
+    /* PythonCallable represents a highlevel abstraction to any PythonObject which is callable
+    *  meaning that callable(object) in Python evaluates to True. A PythonCallable can not be
+    *  constructed from a PythonObject or PyObject* which does not satisfy that requirement.
+    *  A PythonError will be thrown in that instance.
+    */
+
     class PythonCallable : public PythonObject
     {
     public:
@@ -111,12 +117,31 @@ namespace pycpp
 
         PythonCallable& operator=(const PythonObject& other);
 
+        // Note: No move construction/assignment from PythonObject, because due to the PyCallable_Check
+        // they cannot be defined noexcept!
+
+        // Args can be of type PythonObject or of any type which is convertible to PythonObject like long
         template<typename... Args>
-        PythonObject operator()(const Args&... args)
+        PythonObject Invoke(const Args&... args) const
         {
             return CallObject(m_pObject, detail::BuildArgList(args...));
+        }
+
+        template<typename... Args>
+        PythonObject operator()(const Args&... args) const
+        {
+            return Invoke(args...);
         }
     private:
 
     };
+
+    // Shortcut function for calling a function or method which is owned by owningObject with args functionArgs
+    template<typename... Args>
+    PythonObject CallFunction(const PythonObject& owningObject, const std::string& functionName, const Args&... functionArgs)
+    {
+        const PythonCallable methodObj = GetAttributeString(owningObject, functionName);
+
+        return methodObj(functionArgs...);
+    }
 }

@@ -12,9 +12,8 @@
 namespace pycpp
 {
     /*
-        PythonList will can be created of a single type. If you want to use multiple types,
-        use the generic PythonObject as template parameter. For the time being, do not do that
-        as it's not safe
+        PythonList can be created of a single type. If you want to use multiple types,
+        use the generic PythonObject as template parameter.
     */
     template<typename T>
     class PythonList : public PythonObject
@@ -74,8 +73,6 @@ namespace pycpp
             if (!m_pObject)
                 throw PythonError();
         }
-
-        // Variadic Constructor disabled atm. Use the initializer_list overload
 
         PythonList(const std::initializer_list<T>& iList)
         {
@@ -244,6 +241,12 @@ namespace pycpp
 
     private:
     };
+
+    template<typename Container>
+    PythonList(const Container& container)->PythonList<typename Container::value_type>;
+
+    template<typename T>
+    PythonList(std::initializer_list<T>)->PythonList<T>;
 }
 
 #endif // !PYTHON_LIST_H
