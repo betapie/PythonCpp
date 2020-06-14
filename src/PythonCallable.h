@@ -138,10 +138,16 @@ namespace pycpp
 
     // Shortcut function for calling a function or method which is owned by owningObject with args functionArgs
     template<typename... Args>
-    PythonObject CallFunction(const PythonObject& owningObject, const std::string& functionName, const Args&... functionArgs)
+    PythonObject CallFunction(const PythonObject& owningObject, const char* functionName, const Args&... functionArgs)
     {
         const PythonCallable methodObj = GetAttributeString(owningObject, functionName);
 
         return methodObj(functionArgs...);
+    }
+
+    template<typename... Args>
+    PythonObject CallFunction(const PythonObject& owningObject, const std::string& functionName, const Args&... functionArgs)
+    {
+        return CallFunction(owningObject, functionName.c_str(), functionArgs...);
     }
 }
