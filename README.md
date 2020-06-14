@@ -14,7 +14,7 @@ class Printer:
         print(arg)
 ```
 
-Now let us import that class, instantiate an instance of it and call it with some parameter from c++. For demonstrations sake we will be using a vector which will be turned to a Python list and then be printed. An implementation using the raw Python C API with pretty much full error checking and decreffing might look somethig like this - to be fair this could be written a lot better and I was honestly suprised at how long this got...
+Now let us import that class, instantiate an instance of it and call it with some parameter from c++. For demonstrations sake we will be using a vector which will be turned to a Python list and then be printed. An implementation using the raw Python C API with pretty much full error checking and decreffing might look something like this - to be fair this could be written a lot better and I was honestly suprised at how long this got...
 
 ```c++
 void LogPythonError();
@@ -230,7 +230,7 @@ void ConvertAndPrint(const std::vector<int>& toPrint)
     }
 }
 ```
-In fact this could even be templated and work with any STL container and work as long as
+In fact this could even be templated and work with any STL container as long as
 ```c++
 pycpp::isPythonBaseType<Container::value_type>::value
 ```
