@@ -15,6 +15,7 @@
 #include "PythonInterpreter.h"
 #include "PythonSys.h"
 #include "PythonList.h"
+#include "PythonTuple.h"
 #include "PythonCallable.h"
 #include "PythonUtilities.h"
 

@@ -73,7 +73,8 @@ namespace pycpp
     template<typename T>
     constexpr auto isPythonBaseType_v = isPythonBaseType<T>::value;
 
-    template<typename T> // base template, this will not do anything except warning about wrong types
+    // base template, this will not do anything except warning about wrong types
+    template<typename T, std::enable_if_t<!std::is_pointer_v<T>, int> = 0>
     [[nodiscard]] PythonObject ToPythonObject(const T& val)
     {
         static_assert(isPythonBaseType_v<T>, "ToPythonObject: Type not supported");
@@ -157,7 +158,22 @@ namespace pycpp
         return pObject;
     }
 
-    // TODO ToPythonObject for const char* and std::string
+    [[nodiscard]] PythonObject ToPythonObject(const char* str)
+    {
+        PythonObject pObject = PyUnicode_FromString(str);
+        if (!pObject)
+            throw PythonError();
+        return pObject;
+    }
+
+    template<>
+    [[nodiscard]] PythonObject ToPythonObject(const std::string& str)
+    {
+        PythonObject pObject = PyUnicode_FromString(str.c_str());
+        if (!pObject)
+            throw PythonError();
+        return pObject;
+    }
 
     // python_cast converts the contents of a PythonObject to your desired type, if possible.
     // for example a conversion to long will succeed, if the Python object pointed to is of type int or has
