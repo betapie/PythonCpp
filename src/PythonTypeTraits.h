@@ -293,7 +293,7 @@ namespace pycpp
     }
 
     template<typename T> // base template, this will not do anything except warning about wrong types
-    [[nodiscard]] T python_cast(PyObject* pPyObj)
+    [[nodiscard]] T python_cast(PyObject*)
     {
         static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
         return T{};
@@ -309,6 +309,18 @@ namespace pycpp
             return true;
         return false;
     }
+
+#ifndef Py_LIMITED_API
+    template<>
+    [[nodiscard]] int python_cast<int>(PyObject* pPyObj)
+    {
+        const auto ret = _PyLong_AsInt(pPyObj);
+        if (PyErr_Occurred())
+            throw PythonError();
+
+        return ret;
+    }
+#endif //Py_LIMITED_API
 
     template<>
     [[nodiscard]] long python_cast<long>(PyObject* pPyObj)
@@ -371,6 +383,15 @@ namespace pycpp
             throw PythonError();
 
         return { real, imag };
+    }
+
+    template<>
+    [[nodiscard]] const char* python_cast<const char*>(PyObject* pPyObj)
+    {
+        const auto pData = PyUnicode_AsUTF8(pPyObj);
+        if (!pData)
+            throw PythonError();
+        return pData;
     }
 
     template<>
