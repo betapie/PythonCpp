@@ -11,6 +11,9 @@
 
 namespace pycpp
 {
+    template<typename... Ts>
+    class PythonTuple;
+
     namespace detail
     {
         template<typename tuple_t, size_t... idx>
@@ -18,6 +21,73 @@ namespace pycpp
         {
             return PyTuple_Pack(std::tuple_size<tuple_t>::value, ToPythonObject(std::get<idx>(tuple)).get()...);
         }
+
+        // Helper for deducing slice types:
+        template<size_t... idx>
+        struct Seq
+        {
+            using type = Seq;
+        };
+
+        template<typename seq1, typename seq2>
+        struct ConcatSeqs;
+
+        template<size_t... idx1, size_t... idx2>
+        struct ConcatSeqs<Seq<idx1...>, Seq<idx2...>>
+        {
+            using type = Seq<idx1..., idx2...>;
+        };
+
+        template<size_t low, size_t len>
+        struct MakeSliceImpl;
+
+        template<size_t low, size_t len>
+        struct MakeSliceHelper
+        {
+            using type = typename MakeSliceImpl<low, len>::type;
+        };
+
+        template<size_t low, size_t len>
+        struct MakeSliceImpl
+        {
+            using type = typename ConcatSeqs<
+                typename MakeSliceHelper<low, len / 2>::type,
+                typename MakeSliceHelper<low + len / 2, len - len / 2>::type>::type;
+        };
+
+        template<size_t low>
+        struct MakeSliceImpl<low, 0>
+        {
+            using type = Seq<>;
+        };
+
+        template<size_t low>
+        struct MakeSliceImpl<low, 1>
+        {
+            using type = Seq<low>;
+        };
+
+        template<size_t low, size_t high>
+        struct MakeSlice
+        {
+            using type = typename MakeSliceHelper<low, high - low>::type;
+        };
+
+        template<typename tuple_t, typename seq>
+        struct TupleSliceImpl
+        {};
+
+        template<typename tuple_t, size_t... idx>
+        struct TupleSliceImpl<tuple_t, Seq<idx...>>
+        {
+            using type = typename PythonTuple<std::tuple_element_t<idx, tuple_t>...>;
+        };
+
+        template<typename tuple_t, size_t low, size_t high>
+        struct TupleSlice
+        {
+            using type = typename TupleSliceImpl<tuple_t, typename MakeSlice<low, high>::type>::type;
+        };
     }
 
     template<typename... Ts>
@@ -85,7 +155,7 @@ namespace pycpp
         // Note: No move construction/assignment from PythonObject, because due to the PyTuple_Check
         // they cannot be defined noexcept!
 
-        [[nodiscard]] size_t size() const noexcept
+        [[nodiscard]] constexpr size_t size() const noexcept
         {
             return sizeof...(Ts);
         }
@@ -99,9 +169,16 @@ namespace pycpp
             return python_cast<typename std::tuple_element_t<idx, std::tuple<Ts...>>>(pItem);
         }
 
-    private:
-        
+        template<size_t lowIdx, size_t highIdx>
+        typename detail::TupleSlice<std::tuple<Ts...>, lowIdx, highIdx>::type slice()
+        {
+            auto pSlice = PyTuple_GetSlice(m_pObject, lowIdx, highIdx);
+            if (!pSlice)
+                throw PythonError();
+            return detail::TupleSlice<std::tuple<Ts...>, lowIdx, highIdx>::type(pSlice);
+        }
 
+    private:
     };
 
     template<typename... Ts>

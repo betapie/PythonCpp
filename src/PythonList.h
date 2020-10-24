@@ -212,6 +212,11 @@ namespace pycpp
                 throw PythonError();
         }
 
+        PythonList slice(size_t lowIdx, size_t highIdx) const
+        {
+            return PythonList(PyList_GetSlice(m_pObject, lowIdx, highIdx));
+        }
+
         void sort()
         {
             if (PyList_Sort(m_pObject) == -1)
