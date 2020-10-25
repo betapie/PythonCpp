@@ -116,6 +116,8 @@ namespace pycpp
         {
             if (PyTuple_Check(pTupleObj) == 0)
                 throw PythonError("Pyobject not of Tuple type");
+            if (PyTuple_Size(pTupleObj) != sizeof...(Ts))
+                throw PythonError("Size mismatch in PythonTuple");
         }
 
         PythonTuple(const PythonTuple& other)
@@ -178,7 +180,17 @@ namespace pycpp
             return detail::TupleSlice<std::tuple<Ts...>, lowIdx, highIdx>::type(pSlice);
         }
 
+        std::tuple<Ts...> ToStdTuple()
+        {
+            return _ToStdTupleImpl(std::make_index_sequence<sizeof...(Ts)>());
+        }
+
     private:
+        template<size_t... idx>
+        std::tuple<Ts...> _ToStdTupleImpl(std::index_sequence<idx...>)
+        {
+            return std::make_tuple(at<idx>()...);
+        }
     };
 
     template<typename... Ts>

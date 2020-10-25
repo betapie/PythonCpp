@@ -74,7 +74,7 @@ namespace pycpp
     constexpr auto isPythonBaseType_v = isPythonBaseType<T>::value;
 
     // base template, this will not do anything except warning about wrong types
-    template<typename T, std::enable_if_t<!std::is_pointer_v<T>, int> = 0>
+    template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
     [[nodiscard]] PythonObject ToPythonObject(const T& val)
     {
         static_assert(isPythonBaseType_v<T>, "ToPythonObject: Type not supported");
@@ -175,17 +175,29 @@ namespace pycpp
         return pObject;
     }
 
+    template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
+    [[nodiscard]] constexpr T ToPythonObject(const T& val)
+    {
+        return T(val);
+    }
+
     // python_cast converts the contents of a PythonObject to your desired type, if possible.
     // for example a conversion to long will succeed, if the Python object pointed to is of type int or has
     // __int__() implemented (can be converted to int). This cast will also check for possible overflow
     // note: Python C API allows for conversion from int to double etc. These will not be supported.
     // Please cast them accordingly and if you need conversions cast them manually
 
-    template<typename T> // base template, this will not do anything except warning about wrong types
+    template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0> // base template, this will not do anything except warning about wrong types
     [[nodiscard]] T python_cast(const PythonObject& pyObj)
     {
         static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
         return T{};
+    }
+
+    template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
+    [[nodiscard]] T python_cast(const PythonObject& pyObj)
+    {
+        return T{ pyObj };
     }
 
     template<>
@@ -292,11 +304,19 @@ namespace pycpp
         return std::string(pData);
     }
 
-    template<typename T> // base template, this will not do anything except warning about wrong types
+    // base template, this will not do anything except warning about wrong types
+    template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
     [[nodiscard]] T python_cast(PyObject*)
     {
         static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
         return T{};
+    }
+
+    template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
+    [[nodiscard]] T python_cast(PyObject* pPyObj)
+    {
+        Py_INCREF(pPyObj);
+        return T(pPyObj);
     }
 
     template<>
@@ -402,6 +422,12 @@ namespace pycpp
             throw PythonError();
         return std::string(pData);
     }
+
+   /* template<typename T, std::enable_if_t<isPythonBaseType_v<T>, int> = 0>
+    [[nodiscard]] PythonList<T> python_cast<PythonList<T>>(PyObject* pPyObj)
+    {
+        return PythonList<T>(pPyObj);
+    }*/
 
     // TODO: implement unchecked_python_cast and forced_python_cast
 }
