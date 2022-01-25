@@ -8,10 +8,28 @@ namespace pycpp
         template<typename T>
         struct ArgRepr
         {
-            constexpr static auto value = 'O';
+            
         };
 
-        // TODO checkout type for bool
+        // TODO special case for bool
+
+        template<typename CharT>
+        struct ArgRepr<std::basic_string<CharT>>
+        {
+            constexpr static auto value = ArgRepr<const CharT*>::value;
+        };
+
+        template<>
+        struct ArgRepr<const char*>
+        {
+            constexpr static auto value = 's';
+        };
+
+        template<>
+        struct ArgRepr<const wchar_t*>
+        {
+            constexpr static auto value = 'u';
+        };
 
         template<>
         struct ArgRepr<int>
@@ -20,9 +38,57 @@ namespace pycpp
         };
 
         template<>
+        struct ArgRepr<char>
+        {
+            constexpr static auto value = 'b';
+        };
+
+        template<>
+        struct ArgRepr<short>
+        {
+            constexpr static auto value = 'h';
+        };
+
+        template<>
         struct ArgRepr<long>
         {
             constexpr static auto value = 'l';
+        };
+
+        template<>
+        struct ArgRepr<unsigned int>
+        {
+            constexpr static auto value = 'I';
+        };
+
+        template<>
+        struct ArgRepr<unsigned char>
+        {
+            constexpr static auto value = 'B';
+        };
+
+        template<>
+        struct ArgRepr<unsigned short>
+        {
+            constexpr static auto value = 'H';
+        };
+
+        template<>
+        struct ArgRepr<unsigned long>
+        {
+            constexpr static auto value = 'k';
+        };
+
+        template<>
+        struct ArgRepr<long long>
+        {
+            constexpr static auto value = 'L';
+        };
+
+        template<>
+        struct ArgRepr<unsigned long long>
+        {
+            constexpr static auto value = 'K';
         };
 
         template<>
@@ -52,7 +118,7 @@ namespace pycpp
         template<typename... Args>
         struct ArgFormatString
         {
-            constexpr static char value[] = { '(', ArgRepr<Args>::value ..., ')' };
+            constexpr static char value[] = { '(', ArgRepr<Args>::value ..., ')', '\0' };
         };
 
         template<typename T, bool isPyObj = false>
@@ -71,6 +137,12 @@ namespace pycpp
         struct BuildType : BuildTypeBase<T, std::is_base_of_v<PythonObject, T>>
         {};
 
+        template<typename CharT>
+        struct BuildType<std::basic_string<CharT>>
+        {
+            using type = const CharT*;
+        };
+
         template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
         typename BuildType<T>::type PrepareForBuild(const T& value)
         {
@@ -82,6 +154,13 @@ namespace pycpp
         {
             return pyObj.get();
         }
+
+        template<typename CharT>
+        typename BuildType<std::basic_string<CharT>>::type PrepareForBuild(const std::basic_string<CharT>& str)
+        {
+            return str.c_str();
+        }
+        
 
         template<typename... Args>
         PythonObject BuildArgList(const Args&... args)
