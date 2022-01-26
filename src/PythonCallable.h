@@ -3,6 +3,20 @@
 
 namespace pycpp
 {
+    template<typename... Args>
+    PythonObject BuildValue(const char* format, Args... args)
+    {
+        PythonObject ret = Py_BuildValue(format, args...);
+        if (!ret)
+            throw PythonError();
+        return ret;
+    }
+
+    PythonObject CallObject(PyObject* pCallableObject, PyObject* pArglist);
+    PythonObject CallObject(const PythonObject& callableObject, PyObject* pArglist);
+    PythonObject CallObject(PyObject* pCallableObject, const PythonObject& arglist);
+    PythonObject CallObject(const PythonObject& callableObject, const PythonObject& arglist);
+
     namespace detail
     {
         template<typename T>
@@ -199,7 +213,7 @@ namespace pycpp
         // Note: No move construction/assignment from PythonObject, because due to the PyCallable_Check
         // they cannot be defined noexcept!
 
-        // Args can be of type PythonObject or of any type which is convertible to PythonObject like long
+        // Args can be of type PythonObject or of any type which is convertible to PythonObject
         template<typename... Args>
         PythonObject Invoke(const Args&... args) const
         {

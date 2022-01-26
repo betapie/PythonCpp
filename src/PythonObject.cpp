@@ -1,4 +1,5 @@
 #include "PythonObject.h"
+#include "PythonError.h"
 
 pycpp::PythonObject::PythonObject(nullptr_t) noexcept
 {}
@@ -99,6 +100,29 @@ std::string pycpp::PythonObject::StringRepr() noexcept
     if (!pyStr)
         return std::string();
     return std::string(PyBytes_AsString(pyStr.get()));
+}
+
+bool pycpp::PythonObject::HasAttribute(const char* attribute) noexcept
+{
+    return PyObject_HasAttrString(m_pObject, attribute) == 1;
+}
+
+bool pycpp::PythonObject::HasAttribute(const std::string& str) noexcept
+{
+    return PyObject_HasAttrString(m_pObject, str.c_str()) == 1;
+}
+
+pycpp::PythonObject pycpp::PythonObject::GetAttribute(const char* attribute)
+{
+    auto pRes = PyObject_GetAttrString(m_pObject, attribute);
+    if (!pRes)
+        throw(PythonError());
+    return PythonObject(pRes);
+}
+
+pycpp::PythonObject pycpp::PythonObject::GetAttribute(const std::string& str)
+{
+    return GetAttribute(str.c_str());
 }
 
 pycpp::PythonObject pycpp::PythonObject::BorrowedRef(PyObject* pPyObj)

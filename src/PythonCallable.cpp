@@ -1,5 +1,28 @@
 #include "PythonCallable.h"
 
+pycpp::PythonObject pycpp::CallObject(PyObject* pCallableObject, PyObject* pArglist)
+{
+    PythonObject retVal = PyEval_CallObject(pCallableObject, pArglist);
+    if (!retVal)
+        throw PythonError();
+    return retVal;
+}
+
+pycpp::PythonObject pycpp::CallObject(const PythonObject& callableObject, PyObject* pArglist)
+{
+    return CallObject(callableObject.get(), pArglist);
+}
+
+pycpp::PythonObject pycpp::CallObject(PyObject* pCallableObject, const PythonObject& arglist)
+{
+    return CallObject(pCallableObject, arglist.get());
+}
+
+pycpp::PythonObject pycpp::CallObject(const PythonObject& callableObject, const PythonObject& arglist)
+{
+    return CallObject(callableObject.get(), arglist.get());
+}
+
 pycpp::PythonCallable::PythonCallable(PyObject* pCallableObject)
     :PythonObject(pCallableObject)
 {

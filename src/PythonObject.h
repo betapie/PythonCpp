@@ -50,6 +50,12 @@ namespace pycpp
         // In the worst case, the returned string is null
         [[nodiscard]] std::string StringRepr() noexcept;
 
+        [[nodiscard]] bool HasAttribute(const char* attribute) noexcept;
+        [[nodiscard]] bool HasAttribute(const std::string& str) noexcept;
+
+        PythonObject GetAttribute(const char* attribute);
+        PythonObject GetAttribute(const std::string& str);
+
         [[nodiscard]] static PythonObject BorrowedRef(PyObject* pPyObj);
 
     protected:

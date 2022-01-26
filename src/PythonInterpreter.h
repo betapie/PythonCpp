@@ -31,11 +31,34 @@ namespace pycpp
         };
     }
 
+    class PythonInterpreterHandle
+    {
+        friend class PythonInterpreter;
+    private:
+        PythonInterpreterHandle();
+    public:
+        ~PythonInterpreterHandle();
+
+        PythonInterpreterHandle(const PythonInterpreterHandle& other);
+        PythonInterpreterHandle& operator=(const PythonInterpreterHandle& other);
+        PythonInterpreterHandle(PythonInterpreterHandle&& other) noexcept;
+        PythonInterpreterHandle& operator=(PythonInterpreterHandle&& other) noexcept;
+
+        void Release();
+        void Aquire();
+
+        [[nodiscard]] bool Aqurired() noexcept;
+
+    private:
+        bool _owns = true;
+    };
+
     class PythonInterpreter
     {
     public:
         static void Open();
         static void Close();
+        static PythonInterpreterHandle Handle();
 
         /* 
             if you want to access the interpreter from multiple threads,
