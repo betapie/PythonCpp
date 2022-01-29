@@ -19,7 +19,7 @@ namespace pycpp
 
     namespace detail
     {
-        template<typename T>
+        template<typename T, typename U = void>
         struct ArgRepr
         {
             
@@ -119,6 +119,12 @@ namespace pycpp
 
         template<>
         struct ArgRepr<PythonObject>
+        {
+            constexpr static auto value = 'O';
+        };
+
+        template<typename T>
+        struct ArgRepr<T, typename std::enable_if_t<std::is_base_of_v<PythonObject, T>>>
         {
             constexpr static auto value = 'O';
         };

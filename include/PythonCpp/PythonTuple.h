@@ -80,7 +80,7 @@ namespace pycpp
         template<typename tuple_t, size_t... idx>
         struct TupleSliceImpl<tuple_t, Seq<idx...>>
         {
-            using type = typename PythonTuple<std::tuple_element_t<idx, tuple_t>...>;
+            using type = PythonTuple<std::tuple_element_t<idx, tuple_t>...>;
         };
 
         template<typename tuple_t, size_t low, size_t high>
