@@ -1,9 +1,9 @@
 # PythonCpp
-Working with the Python C API can be quite a hassle. Some API functions will give you a handle to a Python object that has to be ref counted, some will give you borrowed references and some will steal them. In addition to that pretty much any non trivial call to a Python C API function has a reasonable chance to fail at runtime which leads to code that has to error check after any call of a Python C API function.
+Working with the Python C API can be quite a hassle. Some API functions will give you a handle to a Python object that has to be ref counted, some will give you borrowed references and some will steal them. Additionally pretty much any non trivial call to a Python C API function has a reasonable chance to fail at runtime which leads to code that has to error check after any call of a Python C API function.
 
-The aim of this project is to offer a light weight c++ wrapper around the Python C API that - by using RAII, exceptions and type tracking - makes using it easy and safe.
+The aim of this project is to offer a light weight c++ wrapper around the Python C API that - by using RAII, exceptions and type checking - makes using it easy and safe.
 
-Consider the following (to be fair pathological) example. Let us define a useless Printer class in in a file my_print.py that might process the input by setting the _args field.
+Consider the following (to be fair pathological) example. Let us define a Printer class in in a file my_print.py that might process the input by setting the _args field.
 
 ```python
 class Printer:
@@ -14,7 +14,7 @@ class Printer:
         print(arg)
 ```
 
-Now let us import that class, instantiate an instance of it and call it with some parameter from c++. For demonstrations sake we will be using a vector which will be turned to a Python list and then be printed. An implementation using the raw Python C API with pretty much full error checking and decreffing might look something like this - to be fair this could be written a lot better and I was honestly suprised at how long this got...
+Now let us import that class, instantiate an instance of it and call its Print Method with some parameter from c++. For demonstrations sake we will be using a vector which will be turned to a Python list and then be printed. An implementation using the raw Python C API with pretty much full error checking and decreffing might look something like this - to be fair this could be written a lot better and I was honestly suprised at how long this got...
 
 ```c++
 void LogPythonError();
@@ -206,7 +206,7 @@ Using this wrapper all of this could be condensed to this:
 ```c++
 void ConvertAndPrint(const std::vector<int>& toPrint)
 {
-    pycpp::PythonInterpreter::Open();
+    auto handle = pycpp::PythonInterpreter::Handle();
 
     try
     {
@@ -216,11 +216,11 @@ void ConvertAndPrint(const std::vector<int>& toPrint)
 
         const auto printerModule = pycpp::ImportModule("my_print");
 
-        const auto printerClass = pycpp::GetAttributeString(printerModule, "Printer");
+        pycpp::PythonCallable printerClass = printerModule.GetAttribute("Printer");
 
-        const auto printerInstance = pycpp::CallObject(printerClass, pycpp::BuildValue("()"));
+        const auto printerInstance = printerClass();
 
-        pycpp::PythonCallable printMethod = pycpp::GetAttributeString(printerInstance, "Print");
+        pycpp::PythonCallable printMethod = printerInstance.GetAttribute("Print");
 
         printMethod(myList);
     }
@@ -249,11 +249,11 @@ void ConvertAndPrint(const Container& toPrint)
 
         const auto printerModule = pycpp::ImportModule("my_print");
 
-        const auto printerClass = pycpp::GetAttributeString(printerModule, "Printer");
+        pycpp::PythonCallable printerClass = printerModule.GetAttribute("Printer");
 
-        const auto printerInstance = pycpp::CallObject(printerClass, pycpp::BuildValue("()"));
+        const auto printerInstance = printerClass();
 
-        pycpp::PythonCallable printMethod = pycpp::GetAttributeString(printerInstance, "Print");
+        pycpp::PythonCallable printMethod = printerInstance.GetAttribute("Print");
 
         printMethod(myList);
     }
@@ -263,6 +263,3 @@ void ConvertAndPrint(const Container& toPrint)
     }
 }
 ```
-
-## Remarks
-This is tested on pretty much all versions of Python 3.7. Python 3.8 seems to still have issues with the C API as a whole. Also this will require c++17 to compile. Feel free to macro the relevant parts out if you are on an older compiler.
