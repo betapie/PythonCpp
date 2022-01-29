@@ -1,9 +1,8 @@
 Debug
 Release
 x64
-Main.cpp
-Python.h
 *.vcxproj
 *.filters
 *.user
 Scripts
+build
