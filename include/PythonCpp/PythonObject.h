@@ -10,11 +10,12 @@
 
 
 #include "Python.h"
+#include "PyCppDefines.h"
 #include <string>
 
 namespace pycpp
 {
-    class PythonObject
+    class PYCPP_API PythonObject
     {
     public:
         PythonObject() noexcept = default;

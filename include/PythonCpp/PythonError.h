@@ -15,7 +15,7 @@ namespace pycpp
         You can also provide a custom error message
     */
 
-    class PythonError : public std::runtime_error
+    class PYCPP_API PythonError : public std::runtime_error
     {
     public:
         PythonError();

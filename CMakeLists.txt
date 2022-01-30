@@ -20,6 +20,8 @@ file(GLOB SOURCE_FILES
 
 add_library(PythonCpp SHARED ${SOURCE_FILES})
 
+target_compile_definitions(PythonCpp PRIVATE PYCPP_EXPORTS)
+
 target_link_libraries(PythonCpp ${PYTHON_LIBRARIES})
 
 option(BUILD_SAMPLES "Enable or disable building the samples" OFF)

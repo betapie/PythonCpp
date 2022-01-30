@@ -12,10 +12,10 @@ namespace pycpp
         return ret;
     }
 
-    PythonObject CallObject(PyObject* pCallableObject, PyObject* pArglist);
-    PythonObject CallObject(const PythonObject& callableObject, PyObject* pArglist);
-    PythonObject CallObject(PyObject* pCallableObject, const PythonObject& arglist);
-    PythonObject CallObject(const PythonObject& callableObject, const PythonObject& arglist);
+    PYCPP_API PythonObject CallObject(PyObject* pCallableObject, PyObject* pArglist);
+    PYCPP_API PythonObject CallObject(const PythonObject& callableObject, PyObject* pArglist);
+    PYCPP_API PythonObject CallObject(PyObject* pCallableObject, const PythonObject& arglist);
+    PYCPP_API PythonObject CallObject(const PythonObject& callableObject, const PythonObject& arglist);
 
     namespace detail
     {
@@ -195,7 +195,7 @@ namespace pycpp
     *  A PythonError will be thrown in that instance.
     */
 
-    class PythonCallable : public PythonObject
+    class PYCPP_API PythonCallable : public PythonObject
     {
     public:
         PythonCallable() noexcept = default;

@@ -13,7 +13,7 @@
 
 namespace pycpp
 {
-    class PythonSys
+    class PYCPP_API PythonSys
     {
     public:
         static void AddToPath(const std::string& path);

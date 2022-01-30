@@ -13,13 +13,13 @@
 
 namespace pycpp
 {
-    PythonObject ImportModule(const char* module_name);
-    PythonObject ImportModule(const std::string& module_name);
+    PYCPP_API PythonObject ImportModule(const char* module_name);
+    PYCPP_API PythonObject ImportModule(const std::string& module_name);
 
-    PythonObject GetAttributeString(PyObject* pObject, const char* attr_name);
-    PythonObject GetAttributeString(const PythonObject& pObject, const char* attr_name);
-    PythonObject GetAttributeString(PyObject* pObject, const std::string& attr_name);
-    PythonObject GetAttributeString(const PythonObject& pObject, const std::string& attr_name);
+    PYCPP_API PythonObject GetAttributeString(PyObject* pObject, const char* attr_name);
+    PYCPP_API PythonObject GetAttributeString(const PythonObject& pObject, const char* attr_name);
+    PYCPP_API PythonObject GetAttributeString(PyObject* pObject, const std::string& attr_name);
+    PYCPP_API PythonObject GetAttributeString(const PythonObject& pObject, const std::string& attr_name);
 }
 
 #endif // PYTHON_UTILITIES_H

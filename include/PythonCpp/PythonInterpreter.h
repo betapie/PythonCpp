@@ -11,6 +11,7 @@
 */
 
 #include "Python.h"
+#include "PyCppDefines.h"
 #include <mutex>
 #include <memory>
 
@@ -31,7 +32,7 @@ namespace pycpp
         };
     }
 
-    class PythonInterpreterHandle
+    class PYCPP_API PythonInterpreterHandle
     {
         friend class PythonInterpreter;
     private:
@@ -53,7 +54,7 @@ namespace pycpp
         bool _owns = true;
     };
 
-    class PythonInterpreter
+    class PYCPP_API PythonInterpreter
     {
     public:
         static void Open();
