@@ -30,3 +30,29 @@ if(BUILD_SAMPLES)
 	target_link_libraries(PyPlot PUBLIC PythonCpp)
 	target_include_directories(PyPlot PUBLIC ${PROJECT_SOURCE_DIR}/include/PythonCpp)
 endif()
+
+include(FetchContent)
+FetchContent_Declare(
+	googletest
+	URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+)
+
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(
+	PythonCppTests
+	"tests/PythonTypeTraitsTests.cpp"
+	)
+
+target_link_libraries(PythonCppTests
+	gtest_main
+	PythonCpp
+	)
+
+target_include_directories(PythonCppTests PUBLIC ${PROJECT_SOURCE_DIR}/include/PythonCpp)
+
+include(GoogleTest)
+gtest_discover_tests(PythonCppTests)
