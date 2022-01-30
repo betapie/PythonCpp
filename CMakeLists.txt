@@ -21,3 +21,12 @@ file(GLOB SOURCE_FILES
 add_library(PythonCpp SHARED ${SOURCE_FILES})
 
 target_link_libraries(PythonCpp ${PYTHON_LIBRARIES})
+
+option(BUILD_SAMPLES "Enable or disable building the samples" OFF)
+
+if(BUILD_SAMPLES)
+	add_executable(PyPlot ${PROJECT_SOURCE_DIR}/samples/pyplot.cpp)
+
+	target_link_libraries(PyPlot PUBLIC PythonCpp)
+	target_include_directories(PyPlot PUBLIC ${PROJECT_SOURCE_DIR}/include/PythonCpp)
+endif()
