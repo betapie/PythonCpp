@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(PythonCpp)
 
-find_package(PythonLibs REQUIRED)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /W4")
@@ -10,7 +10,7 @@ else()
 endif()
 
 include_directories(
-	${PYTHON_INCLUDE_DIRS}
+	${Python3_INCLUDE_DIRS}
 	${PROJECT_SOURCE_DIR}/include/PythonCpp
 	)
 
@@ -22,7 +22,7 @@ add_library(PythonCpp SHARED ${SOURCE_FILES})
 
 target_compile_definitions(PythonCpp PRIVATE PYCPP_EXPORTS)
 
-target_link_libraries(PythonCpp ${PYTHON_LIBRARIES})
+target_link_libraries(PythonCpp ${Python3_LIBRARIES})
 
 option(BUILD_SAMPLES "Enable or disable building the samples" OFF)
 
