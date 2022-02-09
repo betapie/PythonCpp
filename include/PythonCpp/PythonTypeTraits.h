@@ -70,6 +70,13 @@ namespace pycpp
     struct isPythonBaseType<PythonList<U>> : std::conditional_t<isPythonBaseType<U>::value, std::true_type, std::false_type>
     {};
 
+    template<typename... Ts>
+    class PythonTuple;
+
+    template<typename... Ts>
+    struct isPythonBaseType<PythonTuple<Ts...>> : std::conjunction<isPythonBaseType<Ts>...>
+    {};
+
     template<typename T>
     constexpr auto isPythonBaseType_v = isPythonBaseType<T>::value;
 
