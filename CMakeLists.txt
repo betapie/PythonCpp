@@ -28,10 +28,10 @@ target_compile_definitions(PythonCpp PRIVATE PYCPP_EXPORTS)
 target_link_libraries(PythonCpp ${Python3_LIBRARIES})
 
 if(BUILD_SAMPLES)
-	add_executable(PyPlot ${PROJECT_SOURCE_DIR}/samples/pyplot.cpp)
+	add_executable(pyplot ${PROJECT_SOURCE_DIR}/samples/pyplot.cpp)
 
-	target_link_libraries(PyPlot PUBLIC PythonCpp)
-	target_include_directories(PyPlot PUBLIC ${PROJECT_SOURCE_DIR}/include/PythonCpp)
+	target_link_libraries(pyplot PUBLIC PythonCpp)
+	target_include_directories(pyplot PUBLIC ${PROJECT_SOURCE_DIR}/include/PythonCpp)
 endif()
 
 if(BUILD_TESTS)

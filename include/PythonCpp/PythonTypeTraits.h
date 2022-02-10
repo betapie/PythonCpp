@@ -284,10 +284,10 @@ namespace pycpp
     [[nodiscard]] std::complex<double> python_cast<std::complex<double>>(const PythonObject& pyObj)
     {
         const auto real = PyComplex_RealAsDouble(pyObj.get());
-        if (!real)
+        if (PyErr_Occurred())
             throw PythonError();
         const auto imag = PyComplex_ImagAsDouble(pyObj.get());
-        if (!imag)
+        if (PyErr_Occurred())
             throw PythonError();
 
         return { real, imag };

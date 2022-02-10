@@ -1,17 +1,21 @@
 #include "PythonCpp.h"
 #include <gtest/gtest.h>
 
-#define PYTHON_BASE_TYPE_LIST int,                  \
-                              bool,                 \
-                              long,                 \
-                              unsigned long,        \
-                              long long,            \
-                              unsigned long long,   \
-                              double,               \
-                              std::complex<double>, \
-                              const char *,         \
-                              std::string,          \
-                              pycpp::PythonObject
+#define PYTHON_BASE_TYPES int,                \
+                          bool,               \
+                          long,               \
+                          unsigned long,      \
+                          long long,          \
+                          unsigned long long, \
+                          double,             \
+                          std::complex<double>
+
+#define PYTHON_STRING_TYPES const char *, \
+                            std::string
+
+#define PYTHON_ALL_TYPES PYTHON_BASE_TYPES,   \
+                         PYTHON_STRING_TYPES, \
+                         pycpp::PythonObject
 
 namespace detail
 {
@@ -26,7 +30,7 @@ namespace detail
 
 TEST(PythonTypeTraitsTests, BaseTypeTests)
 {
-    detail::PythonBaseTypeTest<PYTHON_BASE_TYPE_LIST>();
+    detail::PythonBaseTypeTest<PYTHON_ALL_TYPES>();
 }
 
 namespace detail
@@ -42,7 +46,7 @@ namespace detail
 
 TEST(PythonTypeTraitsTests, ListTypeTests)
 {
-    detail::PythonListTypeTest<PYTHON_BASE_TYPE_LIST>();
+    detail::PythonListTypeTest<PYTHON_ALL_TYPES>();
 }
 
 namespace detail
@@ -60,7 +64,57 @@ namespace detail
 
 TEST(PythonTypeTraitsTests, TupleTypeTests)
 {
-    constexpr auto testFullList = pycpp::isPythonBaseType_v<pycpp::PythonTuple<PYTHON_BASE_TYPE_LIST>>;
+    constexpr auto testFullList = pycpp::isPythonBaseType_v<pycpp::PythonTuple<PYTHON_ALL_TYPES>>;
     EXPECT_TRUE(testFullList);
-    detail::PythonTuplePairwiseTypeTest<PYTHON_BASE_TYPE_LIST>();
+    detail::PythonTuplePairwiseTypeTest<PYTHON_ALL_TYPES>();
+}
+
+namespace detail
+{
+    template <typename T>
+    void BasicConversionTestImpl()
+    {
+        auto value = T{};
+        auto pyObj = pycpp::ToPythonObject(value);
+        auto convValue = pycpp::python_cast<T>(pyObj);
+        EXPECT_EQ(value, convValue);
+    }
+
+    template <>
+    void BasicConversionTestImpl<const char *>()
+    {
+        auto *str = "";
+        auto pyObj = pycpp::ToPythonObject(str);
+        auto convStr = pycpp::python_cast<const char *>(pyObj);
+        EXPECT_EQ(strcmp(str, convStr), 0);
+    }
+
+    template <>
+    void BasicConversionTestImpl<std::string>()
+    {
+        std::string str = "";
+        auto pyObj = pycpp::ToPythonObject(str);
+        auto convStr = pycpp::python_cast<std::string>(pyObj);
+        EXPECT_EQ(str, convStr);
+    }
+
+    template <typename T, typename... Rest>
+    void BasicConversionTest()
+    {
+        BasicConversionTestImpl<T>();
+        if constexpr (sizeof...(Rest) > 0)
+            BasicConversionTest<Rest...>();
+    }
+}
+
+TEST(PythonTypeTraitsTests, BasicConversionTests)
+{
+    auto handle = pycpp::PythonInterpreter::Handle();
+    detail::BasicConversionTest<PYTHON_BASE_TYPES>();
+}
+
+TEST(PythonTypeTraitsTests, BasicStringConversionTests)
+{
+    auto handle = pycpp::PythonInterpreter::Handle();
+    detail::BasicConversionTest<PYTHON_STRING_TYPES>();
 }
