@@ -1,6 +1,7 @@
 #include "PythonCpp.h"
 #include <gtest/gtest.h>
 
+// Types that we expect to succeed
 #define PYTHON_BASE_TYPES int,                \
                           bool,               \
                           long,               \
@@ -16,6 +17,12 @@
 #define PYTHON_ALL_TYPES PYTHON_BASE_TYPES,   \
                          PYTHON_STRING_TYPES, \
                          pycpp::PythonObject
+
+// Types that we expect to fail
+#define NONE_PYTHON_BASE_TYPES short, \
+                               char,  \
+                               float, \
+                               void
 
 namespace detail
 {
@@ -67,6 +74,22 @@ TEST(PythonTypeTraitsTests, TupleTypeTests)
     constexpr auto testFullList = pycpp::isPythonBaseType_v<pycpp::PythonTuple<PYTHON_ALL_TYPES>>;
     EXPECT_TRUE(testFullList);
     detail::PythonTuplePairwiseTypeTest<PYTHON_ALL_TYPES>();
+}
+
+namespace detail
+{
+    template <typename T, typename... Rest>
+    void PythonNoneBaseTypeTest()
+    {
+        EXPECT_FALSE(pycpp::isPythonBaseType_v<T>);
+        if constexpr (sizeof...(Rest) > 0)
+            PythonNoneBaseTypeTest<Rest...>();
+    }
+}
+
+TEST(PythonTypeTraitsTests, NoneBaseTypeTests)
+{
+    detail::PythonNoneBaseTypeTest<NONE_PYTHON_BASE_TYPES>();
 }
 
 namespace detail
