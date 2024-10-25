@@ -11,6 +11,7 @@
 
 #include "Python.h"
 #include "PyCppDefines.h"
+#include <cstddef>
 #include <string>
 
 namespace pycpp
@@ -20,7 +21,7 @@ namespace pycpp
     public:
         PythonObject() noexcept = default;
 
-        PythonObject(nullptr_t) noexcept;
+        PythonObject(std::nullptr_t) noexcept;
 
         PythonObject(PyObject* pObject) noexcept;
 
@@ -34,7 +35,7 @@ namespace pycpp
 
         PythonObject operator=(PyObject* pObject) noexcept;
 
-        PythonObject& operator=(nullptr_t);
+        PythonObject& operator=(std::nullptr_t);
 
         virtual ~PythonObject();
 

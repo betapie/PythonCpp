@@ -1,7 +1,7 @@
 #include "PythonObject.h"
 #include "PythonError.h"
 
-pycpp::PythonObject::PythonObject(nullptr_t) noexcept
+pycpp::PythonObject::PythonObject(std::nullptr_t) noexcept
 {}
 
 pycpp::PythonObject::PythonObject(PyObject * pObject) noexcept
@@ -50,7 +50,7 @@ pycpp::PythonObject pycpp::PythonObject::operator=(PyObject* pObject) noexcept
     return *this;
 }
 
-pycpp::PythonObject& pycpp::PythonObject::operator=(nullptr_t)
+pycpp::PythonObject& pycpp::PythonObject::operator=(std::nullptr_t)
 {
     Release();
     return *this;
