@@ -18,7 +18,23 @@ include_directories(
 	)
 
 file(GLOB SOURCE_FILES
-	"${PROJECT_SOURCE_DIR}/src/*.cpp"
+	"include/PythonCpp/PyCppDefines.h"
+	"include/PythonCpp/PythonCallable.h"
+	"src/PythonCallable.cpp"
+	"include/PythonCpp/PythonCpp.h"
+	"include/PythonCpp/PythonError.h"
+	"src/PythonError.cpp"
+	"include/PythonCpp/PythonInterpreter.h"
+	"src/PythonInterpreter.cpp"
+	"include/PythonCpp/PythonList.h"
+	"include/PythonCpp/PythonObject.h"
+	"src/PythonObject.cpp"
+	"include/PythonCpp/PythonSys.h"
+	"src/PythonSys.cpp"
+	"include/PythonCpp/PythonTuple.h"
+	"include/PythonCpp/PythonTypeTraits.h"
+	"include/PythonCpp/PythonUtilities.h"
+	"src/PythonUtilities.cpp"
 	)
 
 add_library(PythonCpp SHARED ${SOURCE_FILES})
