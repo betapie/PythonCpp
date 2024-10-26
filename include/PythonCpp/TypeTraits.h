@@ -1,12 +1,11 @@
 #pragma once
 
-#ifndef PYTHON_TYPE_TRAITS_H
-#define PYTHON_TYPE_TRAITS_H
+#ifndef PYCPP_TYPE_TRAITS_H
+#define PYCPP_TYPE_TRAITS_H
 
 #include <type_traits>
 #include <complex>
-#include "PythonObject.h"
-//#include "PythonList.h"
+#include "Object.h"
 
 namespace pycpp
 {

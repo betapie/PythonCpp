@@ -1,10 +1,10 @@
 #pragma once
-#ifndef PYTHONSYS_H
-#define PYTHONSYS_H
+#ifndef PYCPP_SYS_H
+#define PYCPP_SYS_H
 
 #include <string>
-#include "PythonObject.h"
-#include "PythonError.h"
+#include "Object.h"
+#include "Error.h"
 
 /*
     Very high-level API to the sys module. This will only feature basic

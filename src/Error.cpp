@@ -1,4 +1,4 @@
-#include "PythonError.h"
+#include "Error.h"
 
 pycpp::PythonError::PythonError()
     : std::runtime_error(RetrievePyErrorString())

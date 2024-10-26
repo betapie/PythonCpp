@@ -1,5 +1,5 @@
-#include "PythonUtilities.h"
-#include "PythonError.h"
+#include "Utilities.h"
+#include "Error.h"
 
 pycpp::PythonObject pycpp::ImportModule(const char* module_name)
 {

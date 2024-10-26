@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PYTHON_OBJECT_H
-#define PYTHON_OBJECT_H
+#ifndef PYCPP_OBJECT_H
+#define PYCPP_OBJECT_H
 
 /*
     The PythonObject class resembles the basic wrapper for owning a PyObject*. Any returned
@@ -10,7 +10,7 @@
 
 
 #include "Python.h"
-#include "PyCppDefines.h"
+#include "Defines.h"
 #include <cstddef>
 #include <string>
 

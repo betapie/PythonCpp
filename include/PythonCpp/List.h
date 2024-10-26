@@ -1,10 +1,10 @@
 #pragma once
-#ifndef PYTHON_LIST_H
-#define PYTHON_LIST_H
+#ifndef PYCPP_LIST_H
+#define PYCPP_LIST_H
 
-#include "PythonTypeTraits.h"
-#include "PythonObject.h"
-#include "PythonError.h"
+#include "TypeTraits.h"
+#include "Object.h"
+#include "Error.h"
 #include <initializer_list>
 #include <vector>
 #include <algorithm>

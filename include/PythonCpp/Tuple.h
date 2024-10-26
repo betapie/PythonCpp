@@ -1,12 +1,12 @@
 #pragma once
-#ifndef PYTHON_TUPLE_H
-#define PYTHON_TUPLE_H
+#ifndef PYCPP_TUPLE_H
+#define PYCPP_TUPLE_H
 
 #include <type_traits>
 #include <tuple>
-#include "PythonTypeTraits.h"
-#include "PythonObject.h"
-#include "PythonError.h"
+#include "TypeTraits.h"
+#include "Object.h"
+#include "Error.h"
 
 
 namespace pycpp

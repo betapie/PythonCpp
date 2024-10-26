@@ -1,5 +1,5 @@
-#include "PythonObject.h"
-#include "PythonError.h"
+#include "Object.h"
+#include "Error.h"
 
 pycpp::PythonObject::PythonObject(std::nullptr_t) noexcept
 {}

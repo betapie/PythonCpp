@@ -1,6 +1,6 @@
 #pragma once
-#ifndef PYTHON_INTERPRETER_H
-#define PYTHON_INTERPRETER_H
+#ifndef PYCPP_INTERPRETER_H
+#define PYCPP_INTERPRETER_H
 
 /*
     This class resembles a handle to the Python interpreter which is created by PyInitialize().
@@ -11,7 +11,7 @@
 */
 
 #include "Python.h"
-#include "PyCppDefines.h"
+#include "Defines.h"
 #include <mutex>
 #include <memory>
 

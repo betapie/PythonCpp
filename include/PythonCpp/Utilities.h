@@ -1,14 +1,13 @@
 #pragma once
+#ifndef PYCPP_UTILITIES_H
+#define PYCPP_UTILITIES_H
 
 /*
     Mostly wrappers around the C API functions that can use PythonObjects and throw on errors
 */
 
-#ifndef PYTHON_UTILITIES_H
-#define PYTHON_UTILITIES_H
-
-#include "PythonObject.h"
-#include "PythonError.h"
+#include "Object.h"
+#include "Error.h"
 #include <string>
 
 namespace pycpp
