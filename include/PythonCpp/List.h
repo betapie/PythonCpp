@@ -16,7 +16,7 @@ namespace pycpp
         use the generic PythonObject as template parameter.
     */
     template<typename T>
-    class PythonList : public PythonObject
+    class List : public Object
     {
         static_assert(isPythonBaseType_v<T>, "PythonList<T>: T is not a valid PythonBaseType");
     private:
@@ -24,7 +24,7 @@ namespace pycpp
         class Reference
         {
         public:
-            explicit Reference(PythonList& pyList, size_t idx) noexcept
+            explicit Reference(List& pyList, size_t idx) noexcept
                 : m_list(pyList), m_idx(idx)
             {}
 
@@ -46,7 +46,7 @@ namespace pycpp
             {
                 auto pItem = PyList_GetItem(m_list.get(), m_idx);
                 if (!pItem)
-                    throw PythonError();
+                    throw Error();
                 return python_cast<T>(pItem);
             }
 
@@ -55,99 +55,99 @@ namespace pycpp
                 auto pyObj = ToPythonObject(val);
                 Py_INCREF(pyObj.get()); // PyList_SetItem steals a reference
                 if (PyList_SetItem(m_list.get(), m_idx, pyObj.get()) == -1)
-                    throw PythonError();
+                    throw Error();
                 return *this;
             }
 
         private:
-            PythonList& m_list;
+            List& m_list;
             size_t m_idx;
         };
 
     public:
         // Default constructor will create a new PythonList with size 0
         // analog to myList = [] or myList = List() in Python
-        PythonList()
+        List()
         {
             m_pObject = PyList_New(0);
             if (!m_pObject)
-                throw PythonError();
+                throw Error();
         }
 
-        PythonList(const std::initializer_list<T>& iList)
+        List(const std::initializer_list<T>& iList)
         {
             m_pObject = PyList_New(iList.size());
             if (!m_pObject)
-                throw PythonError();
+                throw Error();
             size_t idx = 0;
             for (const auto& elem : iList)
             {
                 auto newElem = ToPythonObject(elem);
                 Py_INCREF(newElem.get()); // PyList_SetItem steals a ref..
                 if (PyList_SetItem(m_pObject, idx, newElem.get()) == -1)
-                    throw PythonError();
+                    throw Error();
                 ++idx;
             }
         }
 
         template<typename Container, typename val_t = typename Container::value_type, std::enable_if_t<isPythonBaseType_v<val_t>, int> = 0>
-        PythonList(const Container& container)
+        List(const Container& container)
         {
             m_pObject = PyList_New(container.size());
             if (!m_pObject)
-                throw PythonError();
+                throw Error();
             auto idx = 0;
             std::for_each(container.begin(), container.end(), [&](const auto& elem)
                 {
                     auto newElem = ToPythonObject(elem);
                     Py_INCREF(newElem.get()); // PyList_SetItem steals a ref..
                     if (PyList_SetItem(m_pObject, idx, newElem.get()) == -1)
-                        throw PythonError();
+                        throw Error();
                     ++idx;
                 });
         }
 
         // Take ownership of an existing PyObject which points to a Python List or subtype of List
         // Will throw PythonError if object pointed to by PyObject* is not of List type
-        PythonList(PyObject* pListObj)
-            :PythonObject(pListObj)
+        List(PyObject* pListObj)
+            :Object(pListObj)
         {
             if (PyList_Check(pListObj) == 0)
-                throw PythonError("PyObject not of List type"); // TODO more info
+                throw Error("PyObject not of List type"); // TODO more info
         }
 
-        PythonList(const PythonList& other)
-            :PythonObject(other)
+        List(const List& other)
+            :Object(other)
         {}
 
-        PythonList& operator=(const PythonList& other)
+        List& operator=(const List& other)
         {
-            PythonObject::operator=(other);
+            Object::operator=(other);
             return *this;
         }
 
-        PythonList(PythonList&& other) noexcept
-            :PythonObject(std::move(other))
+        List(List&& other) noexcept
+            :Object(std::move(other))
         {}
 
-        PythonList& operator=(PythonList&& other) noexcept
+        List& operator=(List&& other) noexcept
         {
-            PythonObject::operator=(std::move(other));
+            Object::operator=(std::move(other));
             return *this;
         }
 
-        PythonList(const PythonObject& other)
-            :PythonObject(other)
+        List(const Object& other)
+            :Object(other)
         {
             if (PyList_Check(m_pObject) == 0)
-                throw PythonError("PyObject not of List type"); // TODO more info
+                throw Error("PyObject not of List type"); // TODO more info
         }
 
-        PythonList& operator=(const PythonObject& other)
+        List& operator=(const Object& other)
         {
             if (PyList_Check(other.m_pObject) == 0)
-                throw PythonError("PyObject not of List type"); // TODO more info
-            PythonObject::operator=(other);
+                throw Error("PyObject not of List type"); // TODO more info
+            Object::operator=(other);
             return *this;
         }
 
@@ -168,7 +168,7 @@ namespace pycpp
         {
             auto pItem = PyList_GetItem(m_pObject, idx);
             if (!pItem)
-                throw PythonError();
+                throw Error();
             return python_cast<T>(pItem);
         }
 
@@ -177,19 +177,19 @@ namespace pycpp
             const auto py_val = ToPythonObject(val);
 
             if (PyList_Append(m_pObject, py_val.get()) == -1)
-                throw PythonError();
+                throw Error();
         }
 
-        void append(const PythonObject& pyObj)
+        void append(const Object& pyObj)
         {
             if (PyList_Append(m_pObject, pyObj.get()) == -1)
-                throw PythonError();
+                throw Error();
         }
 
         void append(PyObject* pPyObj)
         {
             if (PyList_Append(m_pObject, pPyObj) == -1)
-                throw PythonError();
+                throw Error();
         }
 
         void insert(size_t index, const T& val)
@@ -197,36 +197,36 @@ namespace pycpp
             const auto py_val = ToPythonObject(val);
 
             if (PyList_Insert(m_pObject, index, py_val.get()) == -1)
-                throw PythonError();
+                throw Error();
         }
 
-        void insert(size_t index, const PythonObject& pyObj)
+        void insert(size_t index, const Object& pyObj)
         {
             if (PyList_Insert(m_pObject, index, pyObj.get()) == -1)
-                throw PythonError();
+                throw Error();
         }
 
         void insert(size_t index, PyObject* pPyObj)
         {
             if (PyList_Insert(m_pObject, index, pPyObj) == -1)
-                throw PythonError();
+                throw Error();
         }
 
-        PythonList slice(size_t lowIdx, size_t highIdx) const
+        List slice(size_t lowIdx, size_t highIdx) const
         {
-            return PythonList(PyList_GetSlice(m_pObject, lowIdx, highIdx));
+            return List(PyList_GetSlice(m_pObject, lowIdx, highIdx));
         }
 
         void sort()
         {
             if (PyList_Sort(m_pObject) == -1)
-                throw PythonError();
+                throw Error();
         }
 
         void reverse()
         {
             if (PyList_Reverse(m_pObject) == -1)
-                throw PythonError();
+                throw Error();
         }
 
         // I did not seem to find any way to access the raw data of the PyList object
@@ -238,7 +238,7 @@ namespace pycpp
             {
                 auto pItem = PyList_GetItem(m_pObject, idx);
                 if (!pItem)
-                    throw PythonError();
+                    throw Error();
                 ret.push_back(python_cast<T>(pItem));
             }
             return ret;
@@ -248,10 +248,10 @@ namespace pycpp
     };
 
     template<typename Container>
-    PythonList(const Container& container)->PythonList<typename Container::value_type>;
+    List(const Container& container)->List<typename Container::value_type>;
 
     template<typename T>
-    PythonList(std::initializer_list<T>)->PythonList<T>;
+    List(std::initializer_list<T>)->List<T>;
 }
 
 #endif // !PYTHON_LIST_H

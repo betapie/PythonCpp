@@ -1,8 +1,8 @@
 #include "Interpreter.h"
 
-size_t pycpp::PythonInterpreter::s_refCnt = 0;
-std::mutex pycpp::PythonInterpreter::s_mutex{};
-std::unique_ptr<pycpp::detail::PyInstance> pycpp::PythonInterpreter::s_pInterpreter{};
+size_t pycpp::Interpreter::s_refCnt = 0;
+std::mutex pycpp::Interpreter::s_mutex{};
+std::unique_ptr<pycpp::detail::PyInstance> pycpp::Interpreter::s_pInterpreter{};
 
 pycpp::detail::PyInstance::PyInstance()
 {
@@ -15,69 +15,69 @@ pycpp::detail::PyInstance::~PyInstance()
     Py_Finalize();
 }
 
-pycpp::PythonInterpreterHandle::PythonInterpreterHandle()
+pycpp::InterpreterHandle::InterpreterHandle()
 {
-    PythonInterpreter::Open();
+    Interpreter::Open();
 }
 
-pycpp::PythonInterpreterHandle::~PythonInterpreterHandle()
+pycpp::InterpreterHandle::~InterpreterHandle()
 {
     if (_owns)
-        PythonInterpreter::Close();
+        Interpreter::Close();
 }
 
-pycpp::PythonInterpreterHandle::PythonInterpreterHandle(const PythonInterpreterHandle& other)
+pycpp::InterpreterHandle::InterpreterHandle(const InterpreterHandle& other)
 {
     _owns = other._owns;
     if (_owns)
-        PythonInterpreter::Open();
+        Interpreter::Open();
 }
 
-pycpp::PythonInterpreterHandle& pycpp::PythonInterpreterHandle::operator=(const PythonInterpreterHandle& other)
+pycpp::InterpreterHandle& pycpp::InterpreterHandle::operator=(const InterpreterHandle& other)
 {
     if (_owns)
-        PythonInterpreter::Close();
+        Interpreter::Close();
     _owns = other._owns;
     if (_owns)
-        PythonInterpreter::Open();
+        Interpreter::Open();
     return *this;
 }
 
-pycpp::PythonInterpreterHandle::PythonInterpreterHandle(PythonInterpreterHandle&& other) noexcept
+pycpp::InterpreterHandle::InterpreterHandle(InterpreterHandle&& other) noexcept
 {
     _owns = other._owns;
     other._owns = false;
 }
 
-pycpp::PythonInterpreterHandle& pycpp::PythonInterpreterHandle::operator=(PythonInterpreterHandle&& other) noexcept
+pycpp::InterpreterHandle& pycpp::InterpreterHandle::operator=(InterpreterHandle&& other) noexcept
 {
     if (_owns)
-        PythonInterpreter::Close();
+        Interpreter::Close();
     _owns = other._owns;
     other._owns = false;
     return *this;
 }
 
-void pycpp::PythonInterpreterHandle::Release()
+void pycpp::InterpreterHandle::Release()
 {
     if (_owns)
-        PythonInterpreter::Close();
+        Interpreter::Close();
     _owns = false;
 }
 
-void pycpp::PythonInterpreterHandle::Aquire()
+void pycpp::InterpreterHandle::Aquire()
 {
     if (!_owns)
-        PythonInterpreter::Open();
+        Interpreter::Open();
     _owns = true;
 }
 
-bool pycpp::PythonInterpreterHandle::Aqurired() noexcept
+bool pycpp::InterpreterHandle::Aqurired() noexcept
 {
     return _owns;
 }
 
-void pycpp::PythonInterpreter::Open()
+void pycpp::Interpreter::Open()
 {
     if (s_refCnt == 0)
     {
@@ -86,7 +86,7 @@ void pycpp::PythonInterpreter::Open()
     ++s_refCnt;
 }
 
-void pycpp::PythonInterpreter::Close()
+void pycpp::Interpreter::Close()
 {
     if (s_refCnt > 0)
         --s_refCnt;
@@ -96,13 +96,13 @@ void pycpp::PythonInterpreter::Close()
     }
 }
 
-pycpp::PythonInterpreterHandle pycpp::PythonInterpreter::Handle()
+pycpp::InterpreterHandle pycpp::Interpreter::Handle()
 {
-    return PythonInterpreterHandle();
+    return InterpreterHandle();
 }
 
 [[nodiscard]]
-auto pycpp::PythonInterpreter::getLock()
+auto pycpp::Interpreter::getLock()
 {
     return std::unique_lock<decltype(s_mutex)>(s_mutex);
 }

@@ -16,7 +16,7 @@
 
 #define PYTHON_ALL_TYPES PYTHON_BASE_TYPES,   \
                          PYTHON_STRING_TYPES, \
-                         pycpp::PythonObject
+                         pycpp::Object
 
 // Types that we expect to fail
 #define NONE_PYTHON_BASE_TYPES short, \
@@ -45,7 +45,7 @@ namespace detail
     template <typename T, typename... Rest>
     void PythonListTypeTest()
     {
-        EXPECT_TRUE(pycpp::isPythonBaseType_v<pycpp::PythonList<T>>);
+        EXPECT_TRUE(pycpp::isPythonBaseType_v<pycpp::List<T>>);
         if constexpr (sizeof...(Rest) > 0)
             PythonListTypeTest<Rest...>();
     }
@@ -62,7 +62,7 @@ namespace detail
     void PythonTuplePairwiseTypeTest()
     {
         // adjacent pair wise test, should be enough...
-        constexpr auto test = pycpp::isPythonBaseType_v<pycpp::PythonTuple<T, U>>;
+        constexpr auto test = pycpp::isPythonBaseType_v<pycpp::Tuple<T, U>>;
         EXPECT_TRUE(test);
         if constexpr (sizeof...(Rest) > 0)
             PythonTuplePairwiseTypeTest<U, Rest...>();
@@ -71,7 +71,7 @@ namespace detail
 
 TEST(PythonTypeTraitsTests, TupleTypeTests)
 {
-    constexpr auto testFullList = pycpp::isPythonBaseType_v<pycpp::PythonTuple<PYTHON_ALL_TYPES>>;
+    constexpr auto testFullList = pycpp::isPythonBaseType_v<pycpp::Tuple<PYTHON_ALL_TYPES>>;
     EXPECT_TRUE(testFullList);
     detail::PythonTuplePairwiseTypeTest<PYTHON_ALL_TYPES>();
 }
@@ -132,12 +132,12 @@ namespace detail
 
 TEST(PythonTypeTraitsTests, BasicConversionTests)
 {
-    auto handle = pycpp::PythonInterpreter::Handle();
+    auto handle = pycpp::Interpreter::Handle();
     detail::BasicConversionTest<PYTHON_BASE_TYPES>();
 }
 
 TEST(PythonTypeTraitsTests, BasicStringConversionTests)
 {
-    auto handle = pycpp::PythonInterpreter::Handle();
+    auto handle = pycpp::Interpreter::Handle();
     detail::BasicConversionTest<PYTHON_STRING_TYPES>();
 }

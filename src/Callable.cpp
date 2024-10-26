@@ -1,66 +1,66 @@
 #include "Callable.h"
 
-pycpp::PythonObject pycpp::CallObject(PyObject* pCallableObject, PyObject* pArglist)
+pycpp::Object pycpp::CallObject(PyObject* pCallableObject, PyObject* pArglist)
 {
-    PythonObject retVal = PyEval_CallObject(pCallableObject, pArglist);
+    Object retVal = PyEval_CallObject(pCallableObject, pArglist);
     if (!retVal)
-        throw PythonError();
+        throw Error();
     return retVal;
 }
 
-pycpp::PythonObject pycpp::CallObject(const PythonObject& callableObject, PyObject* pArglist)
+pycpp::Object pycpp::CallObject(const Object& callableObject, PyObject* pArglist)
 {
     return CallObject(callableObject.get(), pArglist);
 }
 
-pycpp::PythonObject pycpp::CallObject(PyObject* pCallableObject, const PythonObject& arglist)
+pycpp::Object pycpp::CallObject(PyObject* pCallableObject, const Object& arglist)
 {
     return CallObject(pCallableObject, arglist.get());
 }
 
-pycpp::PythonObject pycpp::CallObject(const PythonObject& callableObject, const PythonObject& arglist)
+pycpp::Object pycpp::CallObject(const Object& callableObject, const Object& arglist)
 {
     return CallObject(callableObject.get(), arglist.get());
 }
 
-pycpp::PythonCallable::PythonCallable(PyObject* pCallableObject)
-    :PythonObject(pCallableObject)
+pycpp::Callable::Callable(PyObject* pCallableObject)
+    :Object(pCallableObject)
 {
     if (PyCallable_Check(m_pObject) != 1)
-        throw(PythonError("PyObject not callable"));
+        throw(Error("PyObject not callable"));
 }
 
-pycpp::PythonCallable::PythonCallable(const PythonCallable& other)
-    :PythonObject(other)
+pycpp::Callable::Callable(const Callable& other)
+    :Object(other)
 {}
 
-pycpp::PythonCallable& pycpp::PythonCallable::operator=(const PythonCallable & other)
+pycpp::Callable& pycpp::Callable::operator=(const Callable & other)
 {
-    PythonObject::operator=(other);
+    Object::operator=(other);
     return *this;
 }
 
-pycpp::PythonCallable::PythonCallable(PythonCallable&& other) noexcept
-    :PythonObject(std::move(other))
+pycpp::Callable::Callable(Callable&& other) noexcept
+    :Object(std::move(other))
 {}
 
-pycpp::PythonCallable& pycpp::PythonCallable::operator=(PythonCallable && other) noexcept
+pycpp::Callable& pycpp::Callable::operator=(Callable && other) noexcept
 {
-    PythonObject::operator=(std::move(other));
+    Object::operator=(std::move(other));
     return *this;
 }
 
-pycpp::PythonCallable::PythonCallable(const PythonObject& other)
-    :PythonObject(other)
+pycpp::Callable::Callable(const Object& other)
+    :Object(other)
 {
     if (PyCallable_Check(m_pObject) == 0)
-        throw PythonError("PyObject not Callable"); // TODO more info
+        throw Error("PyObject not Callable"); // TODO more info
 }
 
-pycpp::PythonCallable& pycpp::PythonCallable::operator=(const PythonObject& other)
+pycpp::Callable& pycpp::Callable::operator=(const Object& other)
 {
     if (PyCallable_Check(other.get()) == 0)
-        throw PythonError("PyObject not Callable"); // TODO more info
-    PythonObject::operator=(other);
+        throw Error("PyObject not Callable"); // TODO more info
+    Object::operator=(other);
     return *this;
 }

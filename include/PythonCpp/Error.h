@@ -15,14 +15,14 @@ namespace pycpp
         You can also provide a custom error message
     */
 
-    class PYCPP_API PythonError : public std::runtime_error
+    class PYCPP_API Error : public std::runtime_error
     {
     public:
-        PythonError();
+        Error();
 
-        explicit PythonError(const std::string& errMsg);
+        explicit Error(const std::string& errMsg);
 
-        explicit PythonError(const char* errMsg);
+        explicit Error(const char* errMsg);
 
     public:
         static std::string RetrievePyErrorString();

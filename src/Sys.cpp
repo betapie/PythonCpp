@@ -1,29 +1,29 @@
 #include "Sys.h"
 
-void pycpp::PythonSys::AddToPath(const std::string& path)
+void pycpp::Sys::AddToPath(const std::string& path)
 {
     auto* py_path_list = PySys_GetObject("path");
     if (!py_path_list)
-        throw PythonError();
+        throw Error();
 
-    pycpp::PythonObject py_path_string = PyUnicode_FromString(path.c_str());
+    pycpp::Object py_path_string = PyUnicode_FromString(path.c_str());
     if (!py_path_string)
-        throw PythonError();
+        throw Error();
 
     if (PyList_Append(py_path_list, py_path_string.get()) != 0)
-        throw PythonError();
+        throw Error();
 }
 
-void pycpp::PythonSys::AddToPath(const char* path)
+void pycpp::Sys::AddToPath(const char* path)
 {
     auto* py_path_list = PySys_GetObject("path");
     if (!py_path_list)
-        throw PythonError();
+        throw Error();
 
-    pycpp::PythonObject py_path_string = PyUnicode_FromString(path);
+    pycpp::Object py_path_string = PyUnicode_FromString(path);
     if (!py_path_string)
-        throw PythonError();
+        throw Error();
 
     if (PyList_Append(py_path_list, py_path_string.get()) != 0)
-        throw PythonError();
+        throw Error();
 }

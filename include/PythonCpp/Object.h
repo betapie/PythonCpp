@@ -16,28 +16,28 @@
 
 namespace pycpp
 {
-    class PYCPP_API PythonObject
+    class PYCPP_API Object
     {
     public:
-        PythonObject() noexcept = default;
+        Object() noexcept = default;
 
-        PythonObject(std::nullptr_t) noexcept;
+        Object(std::nullptr_t) noexcept;
 
-        PythonObject(PyObject* pObject) noexcept;
+        Object(PyObject* pObject) noexcept;
 
-        PythonObject(const PythonObject& other);
+        Object(const Object& other);
 
-        PythonObject& operator=(const PythonObject& other);
+        Object& operator=(const Object& other);
 
-        PythonObject(PythonObject&& other) noexcept;
+        Object(Object&& other) noexcept;
 
-        PythonObject& operator=(PythonObject&& other) noexcept;
+        Object& operator=(Object&& other) noexcept;
 
-        PythonObject operator=(PyObject* pObject) noexcept;
+        Object operator=(PyObject* pObject) noexcept;
 
-        PythonObject& operator=(std::nullptr_t);
+        Object& operator=(std::nullptr_t);
 
-        virtual ~PythonObject();
+        virtual ~Object();
 
         [[nodiscard]] PyObject* get() const noexcept;
 
@@ -55,10 +55,10 @@ namespace pycpp
         [[nodiscard]] bool HasAttribute(const char* attribute) noexcept;
         [[nodiscard]] bool HasAttribute(const std::string& str) noexcept;
 
-        PythonObject GetAttribute(const char* attribute);
-        PythonObject GetAttribute(const std::string& str);
+        Object GetAttribute(const char* attribute);
+        Object GetAttribute(const std::string& str);
 
-        [[nodiscard]] static PythonObject BorrowedRef(PyObject* pPyObj);
+        [[nodiscard]] static Object BorrowedRef(PyObject* pPyObj);
 
     protected:
         PyObject* m_pObject = nullptr;
