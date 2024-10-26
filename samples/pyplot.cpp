@@ -3,24 +3,24 @@
 
 int main()
 {
-	auto handle = pycpp::PythonInterpreter::Handle();
+	auto handle = pycpp::Interpreter::Handle();
 
 	try
 	{
 		auto plt = pycpp::ImportModule("matplotlib.pyplot");
 
-		pycpp::PythonCallable plotFn = plt.GetAttribute("plot");
+		pycpp::Callable plotFn = plt.GetAttribute("plot");
 
-		pycpp::PythonCallable showFn = plt.GetAttribute("show");
+		pycpp::Callable showFn = plt.GetAttribute("show");
 
-		pycpp::PythonList pyList( {1, 2, 7, 6} );
+		pycpp::List pyList( {1, 2, 7, 6} );
 
 		plotFn(pyList);
 		showFn();
 	}
-	catch( const pycpp::PythonError& ex )
+	catch( const pycpp::Error& ex )
 	{
-		std::cout << "PythonError occured: " << ex.what() << std::endl;
+		std::cout << "Error occured: " << ex.what() << std::endl;
 	}
 	return 0;
 }

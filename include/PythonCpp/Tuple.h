@@ -1,25 +1,25 @@
 #pragma once
-#ifndef PYTHON_TUPLE_H
-#define PYTHON_TUPLE_H
+#ifndef PYCPP_TUPLE_H
+#define PYCPP_TUPLE_H
 
 #include <type_traits>
 #include <tuple>
-#include "PythonTypeTraits.h"
-#include "PythonObject.h"
-#include "PythonError.h"
+#include "TypeTraits.h"
+#include "Object.h"
+#include "Error.h"
 
 
 namespace pycpp
 {
     template<typename... Ts>
-    class PythonTuple;
+    class Tuple;
 
     namespace detail
     {
         template<typename tuple_t, size_t... idx>
         constexpr auto PyTupleUnpack(tuple_t tuple, std::index_sequence<idx...>)
         {
-            return PyTuple_Pack(std::tuple_size<tuple_t>::value, ToPythonObject(std::get<idx>(tuple)).get()...);
+            return PyTuple_Pack(std::tuple_size<tuple_t>::value, ToObject(std::get<idx>(tuple)).get()...);
         }
 
         // Helper for deducing slice types:
@@ -80,7 +80,7 @@ namespace pycpp
         template<typename tuple_t, size_t... idx>
         struct TupleSliceImpl<tuple_t, Seq<idx...>>
         {
-            using type = PythonTuple<std::tuple_element_t<idx, tuple_t>...>;
+            using type = Tuple<std::tuple_element_t<idx, tuple_t>...>;
         };
 
         template<typename tuple_t, size_t low, size_t high>
@@ -91,70 +91,70 @@ namespace pycpp
     }
 
     template<typename... Ts>
-    class PythonTuple : public PythonObject
+    class Tuple : public Object
     {
         static_assert(std::conjunction_v<isPythonBaseType<Ts>...>
-            , "PythonTuple<Ts...>: Not all types of Ts... are valid PythonBaseType");
+            , "Tuple<Ts...>: Not all types of Ts... are valid PythonBaseType");
 
     public:
-        PythonTuple(const Ts&... vals)
+        Tuple(const Ts&... vals)
         {
-            m_pObject = PyTuple_Pack(sizeof...(vals), ToPythonObject(vals).get()...);
+            m_pObject = PyTuple_Pack(sizeof...(vals), ToObject(vals).get()...);
             if (!m_pObject)
-                throw PythonError();
+                throw Error();
         }
 
-        PythonTuple(const std::tuple<Ts...>& tuple)
+        Tuple(const std::tuple<Ts...>& tuple)
         {
             m_pObject = detail::PyTupleUnpack(tuple, std::make_index_sequence<sizeof...(Ts)>());
             if (!m_pObject)
-                throw PythonError();
+                throw Error();
         }
 
-        PythonTuple(PyObject* pTupleObj)
-            :PythonObject(pTupleObj)
+        Tuple(PyObject* pTupleObj)
+            :Object(pTupleObj)
         {
             if (PyTuple_Check(pTupleObj) == 0)
-                throw PythonError("Pyobject not of Tuple type");
+                throw Error("Pyobject not of Tuple type");
             if (PyTuple_Size(pTupleObj) != sizeof...(Ts))
-                throw PythonError("Size mismatch in PythonTuple");
+                throw Error("Size mismatch in Tuple");
         }
 
-        PythonTuple(const PythonTuple& other)
-            :PythonObject(other)
+        Tuple(const Tuple& other)
+            :Object(other)
         {}
 
-        PythonTuple& operator=(const PythonTuple& other)
+        Tuple& operator=(const Tuple& other)
         {
-            PythonObject::operator=(other);
+            Object::operator=(other);
             return *this;
         }
 
-        PythonTuple(PythonTuple&& other) noexcept
-            :PythonObject(std::move(other))
+        Tuple(Tuple&& other) noexcept
+            :Object(std::move(other))
         {}
 
-        PythonTuple& operator=(PythonTuple&& other) noexcept
+        Tuple& operator=(Tuple&& other) noexcept
         {
-            PythonObject::operator=(std::move(other));
+            Object::operator=(std::move(other));
             return *this;
         }
 
-        PythonTuple(const PythonObject& other)
-            :PythonObject(other)
+        Tuple(const Object& other)
+            :Object(other)
         {
             if (PyTuple_Check(m_pObject) == 0)
-                throw PythonError("Pyobject not of Tuple type");
+                throw Error("Pyobject not of Tuple type");
         }
 
-        PythonTuple& operator=(const PythonObject& other)
+        Tuple& operator=(const Object& other)
         {
-            PythonObject::operator=(other);
+            Object::operator=(other);
             if (PyTuple_Check(m_pObject) == 0)
-                throw PythonError("Pyobject not of Tuple type");
+                throw Error("Pyobject not of Tuple type");
         }
 
-        // Note: No move construction/assignment from PythonObject, because due to the PyTuple_Check
+        // Note: No move construction/assignment from Object, because due to the PyTuple_Check
         // they cannot be defined noexcept!
 
         [[nodiscard]] constexpr size_t size() const noexcept
@@ -167,7 +167,7 @@ namespace pycpp
         {
             auto pItem = PyTuple_GetItem(m_pObject, idx);
             if (!pItem)
-                throw PythonError();
+                throw Error();
             return python_cast<typename std::tuple_element_t<idx, std::tuple<Ts...>>>(pItem);
         }
 
@@ -176,7 +176,7 @@ namespace pycpp
         {
             auto pSlice = PyTuple_GetSlice(m_pObject, lowIdx, highIdx);
             if (!pSlice)
-                throw PythonError();
+                throw Error();
             return detail::TupleSlice<std::tuple<Ts...>, lowIdx, highIdx>::type(pSlice);
         }
 
@@ -194,10 +194,10 @@ namespace pycpp
     };
 
     template<typename... Ts>
-    PythonTuple(const Ts&...)->PythonTuple<Ts...>;
+    Tuple(const Ts&...)->Tuple<Ts...>;
 
     template<typename... Ts>
-    PythonTuple(const std::tuple<Ts...>&)->PythonTuple<Ts...>;
+    Tuple(const std::tuple<Ts...>&)->Tuple<Ts...>;
 }
 
 

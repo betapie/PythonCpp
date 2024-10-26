@@ -1,18 +1,18 @@
-#include "PythonError.h"
+#include "Error.h"
 
-pycpp::PythonError::PythonError()
+pycpp::Error::Error()
     : std::runtime_error(RetrievePyErrorString())
 {}
 
-pycpp::PythonError::PythonError(const std::string & errMsg)
+pycpp::Error::Error(const std::string & errMsg)
     : std::runtime_error(errMsg)
 {}
 
-pycpp::PythonError::PythonError(const char* errMsg)
+pycpp::Error::Error(const char* errMsg)
     : std::runtime_error(errMsg)
 {}
 
-std::string pycpp::PythonError::RetrievePyErrorString()
+std::string pycpp::Error::RetrievePyErrorString()
 {
     PyObject* pyExcType;
     PyObject* pyExcValue;
@@ -21,9 +21,9 @@ std::string pycpp::PythonError::RetrievePyErrorString()
     PyErr_Fetch(&pyExcType, &pyExcValue, &pyExcTraceback);
     PyErr_NormalizeException(&pyExcType, &pyExcValue, &pyExcTraceback);
 
-    PythonObject pyExcTypeObj(pyExcType);
-    PythonObject pyExcValueObj(pyExcValue);
-    PythonObject pyExcTracebackObj(pyExcTraceback);
+    Object pyExcTypeObj(pyExcType);
+    Object pyExcValueObj(pyExcValue);
+    Object pyExcTracebackObj(pyExcTraceback);
 
     const auto typeString = pyExcTypeObj.StringRepr();
     const auto valueString = pyExcValueObj.StringRepr();

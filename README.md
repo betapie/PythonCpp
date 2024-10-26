@@ -206,27 +206,27 @@ Using this wrapper all of this could be condensed to this:
 ```c++
 void ConvertAndPrint(const std::vector<int>& toPrint)
 {
-    auto handle = pycpp::PythonInterpreter::Handle();
+    auto handle = pycpp::Interpreter::Handle();
 
     try
     {
-        pycpp::PythonList myList(toPrint);
+        pycpp::List myList(toPrint);
 
-        pycpp::PythonSys::AddToSystemPath("path/to/script");
+        pycpp::Sys::AddToSystemPath("path/to/script");
 
         const auto printerModule = pycpp::ImportModule("my_print");
 
-        pycpp::PythonCallable printerClass = printerModule.GetAttribute("Printer");
+        pycpp::Callable printerClass = printerModule.GetAttribute("Printer");
 
         const auto printerInstance = printerClass();
 
-        pycpp::PythonCallable printMethod = printerInstance.GetAttribute("Print");
+        pycpp::Callable printMethod = printerInstance.GetAttribute("Print");
 
         printMethod(myList);
     }
-    catch (pycpp::PythonError& ex)
+    catch (pycpp::Error& ex)
     {
-        std::cout << "PythonError caught: " << ex.what() << std::endl;
+        std::cout << "Error caught: " << ex.what() << std::endl;
     }
 }
 ```
@@ -239,27 +239,27 @@ evaluates to true:
 template<typename Container>
 void ConvertAndPrint(const Container& toPrint)
 {
-    pycpp::PythonInterpreter::Open();
+    pycpp::Interpreter::Open();
 
     try
     {
-        pycpp::PythonList myList(toPrint);
+        pycpp::List myList(toPrint);
 
-        pycpp::PythonSys::AddToSystemPath("path/to/script");
+        pycpp::Sys::AddToSystemPath("path/to/script");
 
         const auto printerModule = pycpp::ImportModule("my_print");
 
-        pycpp::PythonCallable printerClass = printerModule.GetAttribute("Printer");
+        pycpp::Callable printerClass = printerModule.GetAttribute("Printer");
 
         const auto printerInstance = printerClass();
 
-        pycpp::PythonCallable printMethod = printerInstance.GetAttribute("Print");
+        pycpp::Callable printMethod = printerInstance.GetAttribute("Print");
 
         printMethod(myList);
     }
-    catch (pycpp::PythonError& ex)
+    catch (pycpp::Error& ex)
     {
-        std::cout << "PythonError caught: " << ex.what() << std::endl;
+        std::cout << "Error caught: " << ex.what() << std::endl;
     }
 }
 ```
