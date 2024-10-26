@@ -1,12 +1,11 @@
 #pragma once
 
-#ifndef PYTHON_TYPE_TRAITS_H
-#define PYTHON_TYPE_TRAITS_H
+#ifndef PYCPP_TYPE_TRAITS_H
+#define PYCPP_TYPE_TRAITS_H
 
 #include <type_traits>
 #include <complex>
-#include "PythonObject.h"
-//#include "PythonList.h"
+#include "Object.h"
 
 namespace pycpp
 {
@@ -58,161 +57,161 @@ namespace pycpp
     struct isPythonBaseType<std::string> : std::true_type
     {};
 
-    // using generic PythonObjects should also be allowed but can be dangerous
+    // using generic Objects should also be allowed but can be dangerous
     template<>
-    struct isPythonBaseType<PythonObject> : std::true_type
+    struct isPythonBaseType<Object> : std::true_type
     {};
 
     template<typename T>
-    class PythonList;
+    class List;
 
     template<typename U>
-    struct isPythonBaseType<PythonList<U>> : std::conditional_t<isPythonBaseType<U>::value, std::true_type, std::false_type>
+    struct isPythonBaseType<List<U>> : std::conditional_t<isPythonBaseType<U>::value, std::true_type, std::false_type>
     {};
 
     template<typename... Ts>
-    class PythonTuple;
+    class Tuple;
 
     template<typename... Ts>
-    struct isPythonBaseType<PythonTuple<Ts...>> : std::conjunction<isPythonBaseType<Ts>...>
+    struct isPythonBaseType<Tuple<Ts...>> : std::conjunction<isPythonBaseType<Ts>...>
     {};
 
     template<typename T>
     constexpr auto isPythonBaseType_v = isPythonBaseType<T>::value;
 
     // base template, this will not do anything except warning about wrong types
-    template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
-    [[nodiscard]] PythonObject ToPythonObject(const T&)
+    template<typename T, std::enable_if_t<!std::is_base_of_v<Object, T>, int> = 0>
+    [[nodiscard]] Object ToObject(const T&)
     {
-        static_assert(isPythonBaseType_v<T>, "ToPythonObject: Type not supported");
-        throw PythonError("How did we even get here?");
+        static_assert(isPythonBaseType_v<T>, "ToObject: Type not supported");
+        throw Error("How did we even get here?");
     }
 
-    // note: no implementations for PyLong_FromDouble... and other implicit conversions. If you want your PythonObject
+    // note: no implementations for PyLong_FromDouble... and other implicit conversions. If you want your Object
     // to be of a certain type, be explicit about the type you pass in
 
 #ifndef Py_LIMITED_API
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const int& val)
+    [[nodiscard]] Object ToObject(const int& val)
     {
-        PythonObject pObject = PyLong_FromLong(val);
+        Object pObject = PyLong_FromLong(val);
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 #endif //Py_LIMITED_API
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const long& val)
+    [[nodiscard]] Object ToObject(const long& val)
     {
-        PythonObject pObject = PyLong_FromLong(val);
+        Object pObject = PyLong_FromLong(val);
         if (!pObject)
-            throw PythonError(); // Maybe create badCastError or similar
+            throw Error(); // Maybe create badCastError or similar
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const unsigned long& val)
+    [[nodiscard]] Object ToObject(const unsigned long& val)
     {
-        PythonObject pObject = PyLong_FromUnsignedLong(val);
+        Object pObject = PyLong_FromUnsignedLong(val);
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const long long& val)
+    [[nodiscard]] Object ToObject(const long long& val)
     {
-        PythonObject pObject = PyLong_FromLongLong(val);
+        Object pObject = PyLong_FromLongLong(val);
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const unsigned long long& val)
+    [[nodiscard]] Object ToObject(const unsigned long long& val)
     {
-        PythonObject pObject = PyLong_FromUnsignedLongLong(val);
+        Object pObject = PyLong_FromUnsignedLongLong(val);
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const bool& val)
+    [[nodiscard]] Object ToObject(const bool& val)
     {
-        PythonObject pObject = PyBool_FromLong(val ? static_cast<long>(1) : static_cast<long>(0));
+        Object pObject = PyBool_FromLong(val ? static_cast<long>(1) : static_cast<long>(0));
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const double& val)
+    [[nodiscard]] Object ToObject(const double& val)
     {
-        PythonObject pObject = PyFloat_FromDouble(val);
+        Object pObject = PyFloat_FromDouble(val);
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const std::complex<double>& val)
+    [[nodiscard]] Object ToObject(const std::complex<double>& val)
     {
-        PythonObject pObject = PyComplex_FromDoubles(val.real(), val.imag());
+        Object pObject = PyComplex_FromDoubles(val.real(), val.imag());
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
-    [[nodiscard]] PythonObject ToPythonObject(const char* str)
+    [[nodiscard]] Object ToObject(const char* str)
     {
-        PythonObject pObject = PyUnicode_FromString(str);
+        Object pObject = PyUnicode_FromString(str);
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
     template<>
-    [[nodiscard]] PythonObject ToPythonObject(const std::string& str)
+    [[nodiscard]] Object ToObject(const std::string& str)
     {
-        PythonObject pObject = PyUnicode_FromString(str.c_str());
+        Object pObject = PyUnicode_FromString(str.c_str());
         if (!pObject)
-            throw PythonError();
+            throw Error();
         return pObject;
     }
 
-    template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
-    [[nodiscard]] constexpr T ToPythonObject(const T& val)
+    template<typename T, std::enable_if_t<std::is_base_of_v<Object, T>, int> = 0>
+    [[nodiscard]] constexpr T ToObject(const T& val)
     {
         return T(val);
     }
 
-    // python_cast converts the contents of a PythonObject to your desired type, if possible.
+    // python_cast converts the contents of a Object to your desired type, if possible.
     // for example a conversion to long will succeed, if the Python object pointed to is of type int or has
     // __int__() implemented (can be converted to int). This cast will also check for possible overflow
     // note: Python C API allows for conversion from int to double etc. These will not be supported.
     // Please cast them accordingly and if you need conversions cast them manually
 
-    template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0> // base template, this will not do anything except warning about wrong types
-    [[nodiscard]] T python_cast(const PythonObject&)
+    template<typename T, std::enable_if_t<!std::is_base_of_v<Object, T>, int> = 0> // base template, this will not do anything except warning about wrong types
+    [[nodiscard]] T python_cast(const Object&)
     {
         static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
         return T{};
     }
 
-    template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
-    [[nodiscard]] T python_cast(const PythonObject& pyObj)
+    template<typename T, std::enable_if_t<std::is_base_of_v<Object, T>, int> = 0>
+    [[nodiscard]] T python_cast(const Object& pyObj)
     {
         return T{ pyObj };
     }
 
     template<>
-    [[nodiscard]] bool python_cast<bool>(const PythonObject& pyObj)
+    [[nodiscard]] bool python_cast<bool>(const Object& pyObj)
     {
         const auto check = PyObject_IsTrue(pyObj.get());
         if (check == -1)
-            throw PythonError();
+            throw Error();
         if (check == 1)
             return true;
         return false;
@@ -220,106 +219,106 @@ namespace pycpp
 
 #ifndef Py_LIMITED_API
     template<>
-    [[nodiscard]] int python_cast<int>(const PythonObject& pyObj)
+    [[nodiscard]] int python_cast<int>(const Object& pyObj)
     {
         const auto ret = _PyLong_AsInt(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
 #endif //Py_LIMITED_API
 
     template<>
-    [[nodiscard]] long python_cast<long>(const PythonObject& pyObj)
+    [[nodiscard]] long python_cast<long>(const Object& pyObj)
     {
         const auto ret = PyLong_AsLong(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
 
     template<>
-    [[nodiscard]] unsigned long python_cast<unsigned long>(const PythonObject& pyObj)
+    [[nodiscard]] unsigned long python_cast<unsigned long>(const Object& pyObj)
     {
         const auto ret = PyLong_AsUnsignedLong(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
 
     template<>
-    [[nodiscard]] long long python_cast<long long>(const PythonObject& pyObj)
+    [[nodiscard]] long long python_cast<long long>(const Object& pyObj)
     {
         const auto ret = PyLong_AsLongLong(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
 
     template<>
-    [[nodiscard]] unsigned long long python_cast<unsigned long long>(const PythonObject& pyObj)
+    [[nodiscard]] unsigned long long python_cast<unsigned long long>(const Object& pyObj)
     {
         const auto ret = PyLong_AsUnsignedLongLong(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
 
     template<>
-    [[nodiscard]] double python_cast<double>(const PythonObject& pyObj)
+    [[nodiscard]] double python_cast<double>(const Object& pyObj)
     {
         const auto ret = PyFloat_AsDouble(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
 
     template<>
-    [[nodiscard]] std::complex<double> python_cast<std::complex<double>>(const PythonObject& pyObj)
+    [[nodiscard]] std::complex<double> python_cast<std::complex<double>>(const Object& pyObj)
     {
         const auto real = PyComplex_RealAsDouble(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
         const auto imag = PyComplex_ImagAsDouble(pyObj.get());
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return { real, imag };
     }
 
     template<>
-    [[nodiscard]] const char* python_cast<const char*>(const PythonObject& pyObj)
+    [[nodiscard]] const char* python_cast<const char*>(const Object& pyObj)
     {
         auto pData = PyUnicode_AsUTF8(pyObj.get());
         if (!pData)
-            throw PythonError();
+            throw Error();
         return pData;
     }
 
     template<>
-    [[nodiscard]] std::string python_cast<std::string>(const PythonObject& pyObj)
+    [[nodiscard]] std::string python_cast<std::string>(const Object& pyObj)
     {
         auto pData = PyUnicode_AsUTF8(pyObj.get());
         if (!pData)
-            throw PythonError();
+            throw Error();
         return std::string(pData);
     }
 
     // base template, this will not do anything except warning about wrong types
-    template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
+    template<typename T, std::enable_if_t<!std::is_base_of_v<Object, T>, int> = 0>
     [[nodiscard]] T python_cast(PyObject*)
     {
         static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
         return T{};
     }
 
-    template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
+    template<typename T, std::enable_if_t<std::is_base_of_v<Object, T>, int> = 0>
     [[nodiscard]] T python_cast(PyObject* pPyObj)
     {
         Py_INCREF(pPyObj);
@@ -331,7 +330,7 @@ namespace pycpp
     {
         const auto check = PyObject_IsTrue(pPyObj);
         if (check == -1)
-            throw PythonError();
+            throw Error();
         if (check == 1)
             return true;
         return false;
@@ -343,7 +342,7 @@ namespace pycpp
     {
         const auto ret = _PyLong_AsInt(pPyObj);
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
@@ -354,7 +353,7 @@ namespace pycpp
     {
         const auto ret = PyLong_AsLong(pPyObj);
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
@@ -364,7 +363,7 @@ namespace pycpp
     {
         const auto ret = PyLong_AsUnsignedLong(pPyObj);
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
@@ -374,7 +373,7 @@ namespace pycpp
     {
         const auto ret = PyLong_AsLongLong(pPyObj);
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
@@ -384,7 +383,7 @@ namespace pycpp
     {
         const auto ret = PyLong_AsUnsignedLongLong(pPyObj);
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
@@ -394,7 +393,7 @@ namespace pycpp
     {
         const auto ret = PyFloat_AsDouble(pPyObj);
         if (PyErr_Occurred())
-            throw PythonError();
+            throw Error();
 
         return ret;
     }
@@ -404,10 +403,10 @@ namespace pycpp
     {
         const auto real = PyComplex_RealAsDouble(pPyObj);
         if (!real)
-            throw PythonError();
+            throw Error();
         const auto imag = PyComplex_ImagAsDouble(pPyObj);
         if (!imag)
-            throw PythonError();
+            throw Error();
 
         return { real, imag };
     }
@@ -417,7 +416,7 @@ namespace pycpp
     {
         const auto pData = PyUnicode_AsUTF8(pPyObj);
         if (!pData)
-            throw PythonError();
+            throw Error();
         return pData;
     }
 
@@ -426,14 +425,14 @@ namespace pycpp
     {
         auto pData = PyUnicode_AsUTF8(pPyObj);
         if (!pData)
-            throw PythonError();
+            throw Error();
         return std::string(pData);
     }
 
    /* template<typename T, std::enable_if_t<isPythonBaseType_v<T>, int> = 0>
-    [[nodiscard]] PythonList<T> python_cast<PythonList<T>>(PyObject* pPyObj)
+    [[nodiscard]] List<T> python_cast<List<T>>(PyObject* pPyObj)
     {
-        return PythonList<T>(pPyObj);
+        return List<T>(pPyObj);
     }*/
 
     // TODO: implement unchecked_python_cast and forced_python_cast

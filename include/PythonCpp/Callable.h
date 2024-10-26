@@ -1,21 +1,21 @@
 #pragma once
-#include "PythonUtilities.h"
+#include "Utilities.h"
 
 namespace pycpp
 {
     template<typename... Args>
-    PythonObject BuildValue(const char* format, Args... args)
+    Object BuildValue(const char* format, Args... args)
     {
-        PythonObject ret = Py_BuildValue(format, args...);
+        Object ret = Py_BuildValue(format, args...);
         if (!ret)
-            throw PythonError();
+            throw Error();
         return ret;
     }
 
-    PYCPP_API PythonObject CallObject(PyObject* pCallableObject, PyObject* pArglist);
-    PYCPP_API PythonObject CallObject(const PythonObject& callableObject, PyObject* pArglist);
-    PYCPP_API PythonObject CallObject(PyObject* pCallableObject, const PythonObject& arglist);
-    PYCPP_API PythonObject CallObject(const PythonObject& callableObject, const PythonObject& arglist);
+    PYCPP_API Object CallObject(PyObject* pCallableObject, PyObject* pArglist);
+    PYCPP_API Object CallObject(const Object& callableObject, PyObject* pArglist);
+    PYCPP_API Object CallObject(PyObject* pCallableObject, const Object& arglist);
+    PYCPP_API Object CallObject(const Object& callableObject, const Object& arglist);
 
     namespace detail
     {
@@ -118,13 +118,13 @@ namespace pycpp
         };
 
         template<>
-        struct ArgRepr<PythonObject>
+        struct ArgRepr<Object>
         {
             constexpr static auto value = 'O';
         };
 
         template<typename T>
-        struct ArgRepr<T, typename std::enable_if_t<std::is_base_of_v<PythonObject, T>>>
+        struct ArgRepr<T, typename std::enable_if_t<std::is_base_of_v<Object, T>>>
         {
             constexpr static auto value = 'O';
         };
@@ -154,7 +154,7 @@ namespace pycpp
         };
 
         template<typename T>
-        struct BuildType : BuildTypeBase<T, std::is_base_of_v<PythonObject, T>>
+        struct BuildType : BuildTypeBase<T, std::is_base_of_v<Object, T>>
         {};
 
         template<typename CharT>
@@ -163,13 +163,13 @@ namespace pycpp
             using type = const CharT*;
         };
 
-        template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
+        template<typename T, std::enable_if_t<!std::is_base_of_v<Object, T>, int> = 0>
         typename BuildType<T>::type PrepareForBuild(const T& value)
         {
             return value;
         }
 
-        template<typename T, std::enable_if_t<std::is_base_of_v<PythonObject, T>, int> = 0>
+        template<typename T, std::enable_if_t<std::is_base_of_v<Object, T>, int> = 0>
         typename BuildType<T>::type PrepareForBuild(const T& pyObj)
         {
             return pyObj.get();
@@ -183,51 +183,51 @@ namespace pycpp
         
 
         template<typename... Args>
-        PythonObject BuildArgList(const Args&... args)
+        Object BuildArgList(const Args&... args)
         {
             return BuildValue(ArgFormatString<Args...>::value, PrepareForBuild(args)...);
         }
     }
 
-    /* PythonCallable represents a highlevel abstraction to any PythonObject which is callable
-    *  meaning that callable(object) in Python evaluates to True. A PythonCallable can not be
-    *  constructed from a PythonObject or PyObject* which does not satisfy that requirement.
-    *  A PythonError will be thrown in that instance.
+    /* Callable represents a highlevel abstraction to any Object which is callable
+    *  meaning that callable(object) in Python evaluates to True. A Callable can not be
+    *  constructed from a Object or PyObject* which does not satisfy that requirement.
+    *  A Error will be thrown in that instance.
     */
 
-    class PYCPP_API PythonCallable : public PythonObject
+    class PYCPP_API Callable : public Object
     {
     public:
-        PythonCallable() noexcept = default;
+        Callable() noexcept = default;
 
         // Take ownership of an existing PyObject which points to a callable Python Object
-        // Will throw PythonError if object pointed to by PyObject* is not callable
-        PythonCallable(PyObject* pCallableObject);
+        // Will throw Error if object pointed to by PyObject* is not callable
+        Callable(PyObject* pCallableObject);
 
-        PythonCallable(const PythonCallable& other);
+        Callable(const Callable& other);
 
-        PythonCallable& operator=(const PythonCallable& other);
+        Callable& operator=(const Callable& other);
 
-        PythonCallable(PythonCallable&& other) noexcept;
+        Callable(Callable&& other) noexcept;
 
-        PythonCallable& operator=(PythonCallable&& other) noexcept;
+        Callable& operator=(Callable&& other) noexcept;
 
-        PythonCallable(const PythonObject& other);
+        Callable(const Object& other);
 
-        PythonCallable& operator=(const PythonObject& other);
+        Callable& operator=(const Object& other);
 
-        // Note: No move construction/assignment from PythonObject, because due to the PyCallable_Check
+        // Note: No move construction/assignment from Object, because due to the PyCallable_Check
         // they cannot be defined noexcept!
 
-        // Args can be of type PythonObject or of any type which is convertible to PythonObject
+        // Args can be of type Object or of any type which is convertible to Object
         template<typename... Args>
-        PythonObject Invoke(const Args&... args) const
+        Object Invoke(const Args&... args) const
         {
             return CallObject(m_pObject, detail::BuildArgList(args...));
         }
 
         template<typename... Args>
-        PythonObject operator()(const Args&... args) const
+        Object operator()(const Args&... args) const
         {
             return Invoke(args...);
         }
@@ -237,15 +237,15 @@ namespace pycpp
 
     // Shortcut function for calling a function or method which is owned by owningObject with args functionArgs
     template<typename... Args>
-    PythonObject CallFunction(const PythonObject& owningObject, const char* functionName, const Args&... functionArgs)
+    Object CallFunction(const Object& owningObject, const char* functionName, const Args&... functionArgs)
     {
-        const PythonCallable methodObj = GetAttributeString(owningObject, functionName);
+        const Callable methodObj = GetAttributeString(owningObject, functionName);
 
         return methodObj(functionArgs...);
     }
 
     template<typename... Args>
-    PythonObject CallFunction(const PythonObject& owningObject, const std::string& functionName, const Args&... functionArgs)
+    Object CallFunction(const Object& owningObject, const std::string& functionName, const Args&... functionArgs)
     {
         return CallFunction(owningObject, functionName.c_str(), functionArgs...);
     }

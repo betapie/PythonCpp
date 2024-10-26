@@ -4,25 +4,25 @@
 
 #include "Python.h"
 #include <stdexcept>
-#include "PythonObject.h"
+#include "Object.h"
 
 namespace pycpp
 {
     /*
-        PythonError represents the type of exception that will be thrown if any call to a Python
+        Error represents the type of exception that will be thrown if any call to a Python
         C API function returns an error value. It will fetch the error/exception details from Python
         and make them available by calling what();
         You can also provide a custom error message
     */
 
-    class PYCPP_API PythonError : public std::runtime_error
+    class PYCPP_API Error : public std::runtime_error
     {
     public:
-        PythonError();
+        Error();
 
-        explicit PythonError(const std::string& errMsg);
+        explicit Error(const std::string& errMsg);
 
-        explicit PythonError(const char* errMsg);
+        explicit Error(const char* errMsg);
 
     public:
         static std::string RetrievePyErrorString();
