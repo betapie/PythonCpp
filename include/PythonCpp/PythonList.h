@@ -145,7 +145,7 @@ namespace pycpp
 
         PythonList& operator=(const PythonObject& other)
         {
-            if (PyList_Check(other.m_pObject) == 0)
+            if (PyList_Check(other.get()) == 0)
                 throw PythonError("PyObject not of List type"); // TODO more info
             PythonObject::operator=(other);
             return *this;

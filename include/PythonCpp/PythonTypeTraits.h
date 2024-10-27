@@ -82,7 +82,7 @@ namespace pycpp
 
     // base template, this will not do anything except warning about wrong types
     template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0>
-    [[nodiscard]] PythonObject ToPythonObject(const T& val)
+    [[nodiscard]] PythonObject ToPythonObject(const T&)
     {
         static_assert(isPythonBaseType_v<T>, "ToPythonObject: Type not supported");
         throw PythonError("How did we even get here?");
@@ -195,7 +195,7 @@ namespace pycpp
     // Please cast them accordingly and if you need conversions cast them manually
 
     template<typename T, std::enable_if_t<!std::is_base_of_v<PythonObject, T>, int> = 0> // base template, this will not do anything except warning about wrong types
-    [[nodiscard]] T python_cast(const PythonObject& pyObj)
+    [[nodiscard]] T python_cast(const PythonObject&)
     {
         static_assert(isPythonBaseType_v<T>, "python_cast: Type not supported");
         return T{};
