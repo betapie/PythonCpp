@@ -1,0 +1,49 @@
+name: Ubuntu clang release
+
+# Trigger the workflow on every push to the main branch and on pull requests
+on:
+  push:
+    branches:
+      - master
+      - "feature/*"
+  pull_request:
+    branches:
+      - master
+      - "feature/**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake clang-15
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_C_COMPILER=clang-15 -DCMAKE_CXX_COMPILER=clang++-15 -DCMAKE_BUILD_TYPE=RelWithDeb -DBUILD_TESTS=ON -DBUILD_SAMPLES=ON
+
+      - name: Build with CMake
+        run: cmake --build build
+
+      - name: Run tests
+        run: ./build/PythonCppTests --gtest_output=xml:build/test_results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: build/test_results.xml
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Test results
+          path: build/test_results.xml
+          reporter: java-junit
