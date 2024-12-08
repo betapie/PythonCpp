@@ -12,6 +12,8 @@ else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Wextra")
 endif()
 
+set(CMAKE_CXX_STANDART 17)
+
 include_directories(
 	${Python3_INCLUDE_DIRS}
 	${PROJECT_SOURCE_DIR}/include/PythonCpp
@@ -79,6 +81,10 @@ if(BUILD_TESTS)
 		gtest_main
 		PythonCpp
 		)
+
+  set_target_properties(PythonCppTests PROPERTIES CXX_STANDARD 17)
+  set_target_properties(PythonCppTests PROPERTIES CXX_STANDARD_REQUIRED ON)
+  set_target_properties(PythonCppTests PROPERTIES CXX_EXTENSIONS OFF)
 
 	target_include_directories(PythonCppTests PUBLIC ${PROJECT_SOURCE_DIR}/include/PythonCpp)
 
