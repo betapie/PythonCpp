@@ -2,9 +2,9 @@
 #ifndef PYCPP_LIST_H
 #define PYCPP_LIST_H
 
-#include "TypeTraits.h"
-#include "Object.h"
-#include "Error.h"
+#include <PythonCpp/TypeTraits.h>
+#include <PythonCpp/Object.h>
+#include <PythonCpp/Error.h>
 #include <initializer_list>
 #include <vector>
 #include <algorithm>

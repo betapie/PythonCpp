@@ -7,7 +7,7 @@
 */
 
 #include "Object.h"
-#include "Error.h"
+#include <PythonCpp/Error.h>
 #include <string>
 
 namespace pycpp

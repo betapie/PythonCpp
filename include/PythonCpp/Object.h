@@ -10,7 +10,7 @@
 
 
 #include "Python.h"
-#include "Defines.h"
+#include <PythonCpp/Defines.h>
 #include <cstddef>
 #include <string>
 

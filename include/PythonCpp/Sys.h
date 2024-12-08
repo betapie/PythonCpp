@@ -3,8 +3,8 @@
 #define PYCPP_SYS_H
 
 #include <string>
-#include "Object.h"
-#include "Error.h"
+#include <PythonCpp/Object.h>
+#include <PythonCpp/Error.h>
 
 /*
     Very high-level API to the sys module. This will only feature basic
