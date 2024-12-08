@@ -3,9 +3,10 @@
 #ifndef PYCPP_TYPE_TRAITS_H
 #define PYCPP_TYPE_TRAITS_H
 
+#include <PythonCpp/Object.h>
+#include <PythonCpp/Error.h>
 #include <type_traits>
 #include <complex>
-#include "Object.h"
 
 namespace pycpp
 {

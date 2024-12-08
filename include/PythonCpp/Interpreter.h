@@ -11,7 +11,7 @@
 */
 
 #include "Python.h"
-#include "Defines.h"
+#include <PythonCpp/Defines.h>
 #include <mutex>
 #include <memory>
 

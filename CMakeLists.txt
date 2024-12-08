@@ -14,7 +14,7 @@ endif()
 
 include_directories(
 	${Python3_INCLUDE_DIRS}
-	${PROJECT_SOURCE_DIR}/include/PythonCpp
+	${PROJECT_SOURCE_DIR}/include
 	)
 
 file(GLOB SOURCE_FILES

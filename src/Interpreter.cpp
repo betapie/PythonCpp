@@ -1,4 +1,4 @@
-#include "Interpreter.h"
+#include <PythonCpp/Interpreter.h>
 
 size_t pycpp::Interpreter::s_refCnt = 0;
 std::mutex pycpp::Interpreter::s_mutex{};

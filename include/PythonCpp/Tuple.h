@@ -4,9 +4,9 @@
 
 #include <type_traits>
 #include <tuple>
-#include "TypeTraits.h"
-#include "Object.h"
-#include "Error.h"
+#include <PythonCpp/TypeTraits.h>
+#include <PythonCpp/Object.h>
+#include <PythonCpp/Error.h>
 
 
 namespace pycpp

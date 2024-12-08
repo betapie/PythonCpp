@@ -9,14 +9,14 @@
 #define PYTHON_CPP_H
 
 #include "Python.h"
-#include "Object.h"
-#include "Error.h"
-#include "TypeTraits.h"
-#include "Interpreter.h"
-#include "Sys.h"
-#include "List.h"
-#include "Tuple.h"
-#include "Callable.h"
-#include "Utilities.h"
+#include <PythonCpp/Object.h>
+#include <PythonCpp/Error.h>
+#include <PythonCpp/TypeTraits.h>
+#include <PythonCpp/Interpreter.h>
+#include <PythonCpp/Sys.h>
+#include <PythonCpp/List.h>
+#include <PythonCpp/Tuple.h>
+#include <PythonCpp/Callable.h>
+#include <PythonCpp/Utilities.h>
 
 #endif // PYTHON_CPP_H

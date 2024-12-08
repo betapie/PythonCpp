@@ -4,7 +4,7 @@
 
 #include "Python.h"
 #include <stdexcept>
-#include "Object.h"
+#include <PythonCpp/Object.h>
 
 namespace pycpp
 {
