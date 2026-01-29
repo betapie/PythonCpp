@@ -221,7 +221,7 @@ namespace pycpp
     template<>
     [[nodiscard]] int python_cast<int>(const Object& pyObj)
     {
-        const auto ret = _PyLong_AsInt(pyObj.get());
+        const auto ret = PyLong_AsInt(pyObj.get());
         if (PyErr_Occurred())
             throw Error();
 
@@ -340,7 +340,7 @@ namespace pycpp
     template<>
     [[nodiscard]] int python_cast<int>(PyObject* pPyObj)
     {
-        const auto ret = _PyLong_AsInt(pPyObj);
+        const auto ret = PyLong_AsInt(pPyObj);
         if (PyErr_Occurred())
             throw Error();
 

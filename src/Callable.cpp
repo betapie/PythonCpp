@@ -2,7 +2,7 @@
 
 pycpp::Object pycpp::CallObject(PyObject* pCallableObject, PyObject* pArglist)
 {
-    Object retVal = PyEval_CallObject(pCallableObject, pArglist);
+    Object retVal = PyObject_CallObject(pCallableObject, pArglist);
     if (!retVal)
         throw Error();
     return retVal;
