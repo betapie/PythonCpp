@@ -221,7 +221,7 @@ namespace pycpp
     template<>
     [[nodiscard]] int python_cast<int>(const Object& pyObj)
     {
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION > 13
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 13
         const auto ret = PyLong_AsInt(pyObj.get());
 #else
         const auto ret = _PyLong_AsInt(pyObj.get());
@@ -344,7 +344,7 @@ namespace pycpp
     template<>
     [[nodiscard]] int python_cast<int>(PyObject* pPyObj)
     {
-#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION > 13
+#if PY_MAJOR_VERSION >= 3 && PY_MINOR_VERSION >= 13
         const auto ret = PyLong_AsInt(pPyObj);
 #else
         const auto ret = _PyLong_AsInt(pPyObj);
