@@ -2,31 +2,31 @@
 #ifndef PYTHON_ERROR_H
 #define PYTHON_ERROR_H
 
-#include "Python.h"
-#include <stdexcept>
 #include <PythonCpp/Object.h>
 
-namespace pycpp
-{
-    /*
-        Error represents the type of exception that will be thrown if any call to a Python
-        C API function returns an error value. It will fetch the error/exception details from Python
-        and make them available by calling what();
-        You can also provide a custom error message
-    */
+#include <stdexcept>
 
-    class PYCPP_API Error : public std::runtime_error
-    {
-    public:
-        Error();
+#include "Python.h"
 
-        explicit Error(const std::string& errMsg);
+namespace pycpp {
+/*
+    Error represents the type of exception that will be thrown if any call to a
+   Python C API function returns an error value. It will fetch the
+   error/exception details from Python and make them available by calling
+   what(); You can also provide a custom error message
+*/
 
-        explicit Error(const char* errMsg);
+class PYCPP_API Error : public std::runtime_error {
+ public:
+  Error();
 
-    public:
-        static std::string RetrievePyErrorString();
-    };
-}
+  explicit Error(const std::string& errMsg);
 
-#endif //PYTHON_ERROR_H
+  explicit Error(const char* errMsg);
+
+ public:
+  static std::string RetrievePyErrorString();
+};
+}  // namespace pycpp
+
+#endif  // PYTHON_ERROR_H
