@@ -1,4 +1,4 @@
-#include "Sys.h"
+#include <PythonCpp/Sys.h>
 
 void pycpp::Sys::AddToPath(const std::string& path)
 {

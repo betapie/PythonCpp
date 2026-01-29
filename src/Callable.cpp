@@ -1,4 +1,4 @@
-#include "Callable.h"
+#include <PythonCpp/Callable.h>
 
 pycpp::Object pycpp::CallObject(PyObject* pCallableObject, PyObject* pArglist)
 {
