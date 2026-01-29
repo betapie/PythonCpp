@@ -1,26 +1,23 @@
-#include <iostream>
 #include <PythonCpp.h>
 
-int main()
-{
-	auto handle = pycpp::Interpreter::Handle();
+#include <iostream>
 
-	try
-	{
-		auto plt = pycpp::ImportModule("matplotlib.pyplot");
+int main() {
+  auto handle = pycpp::Interpreter::Handle();
 
-		pycpp::Callable plotFn = plt.GetAttribute("plot");
+  try {
+    auto plt = pycpp::ImportModule("matplotlib.pyplot");
 
-		pycpp::Callable showFn = plt.GetAttribute("show");
+    pycpp::Callable plotFn = plt.GetAttribute("plot");
 
-		pycpp::List pyList( {1, 2, 7, 6} );
+    pycpp::Callable showFn = plt.GetAttribute("show");
 
-		plotFn(pyList);
-		showFn();
-	}
-	catch( const pycpp::Error& ex )
-	{
-		std::cout << "Error occured: " << ex.what() << std::endl;
-	}
-	return 0;
+    pycpp::List pyList({1, 2, 7, 6});
+
+    plotFn(pyList);
+    showFn();
+  } catch (const pycpp::Error& ex) {
+    std::cout << "Error occured: " << ex.what() << std::endl;
+  }
+  return 0;
 }
