@@ -79,7 +79,7 @@ void ConvertAndPrint(const std::vector<int>& toPrint)
         return;
     }
 
-    const auto pyPrinterInstance = PyEval_CallObject(pyPrinterClass, pyBuildValue);
+    const auto pyPrinterInstance = PyObject_CallObject(pyPrinterClass, pyBuildValue);
     if (!pyPrinterInstance)
     {
         Py_DECREF(pyBuildValue);
@@ -141,7 +141,7 @@ void ConvertAndPrint(const std::vector<int>& toPrint)
         return;
     }
 
-    const auto pyRetVal = PyEval_CallObject(pyPrintMethod, pyBuildValue);
+    const auto pyRetVal = PyObject_CallObject(pyPrintMethod, pyBuildValue);
     Py_DECREF(pyBuildValue);
     Py_DECREF(pyPrinterClass);
     Py_DECREF(pyPrintMethod);
